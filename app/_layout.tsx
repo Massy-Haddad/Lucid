@@ -7,6 +7,7 @@ import 'react-native-reanimated'
 import { useEffect } from 'react'
 import { Slot } from 'expo-router'
 import { useFonts } from 'expo-font'
+import * as SystemUI from 'expo-system-ui'
 import { StatusBar } from 'expo-status-bar'
 import * as NavigationBar from 'expo-navigation-bar'
 
@@ -58,6 +59,11 @@ function RootLayoutNav() {
 			await NavigationBar.setPositionAsync('absolute')
 			// transparent backgrounds to see through
 			await NavigationBar.setBackgroundColorAsync('#ffffff00')
+
+			// set the color of UI background
+			if (colorScheme === 'light') {
+				await SystemUI.setBackgroundColorAsync('white')
+			} else await SystemUI.setBackgroundColorAsync('black')
 		}
 		fetchColor()
 	}, [])

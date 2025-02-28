@@ -1,43 +1,53 @@
 {
-  "expo": {
-    "name": "Lucid",
-    "slug": "Lucid",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ],
-      "expo-secure-store",
-      "expo-font"
-    ],
-    "experiments": {
-      "typedRoutes": true
-    }
-  }
+	"expo": {
+		"name": "Lucid",
+		"slug": "Lucid",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./assets/images/icons/ios-light.png",
+		"scheme": "myapp",
+		"userInterfaceStyle": "automatic",
+		"newArchEnabled": true,
+		"ios": {
+			"supportsTablet": true,
+			"icon": {
+				"light": "./assets/images/icons/ios-light.png",
+				"dark": "./assets/images/icons/ios-dark.png",
+				"tinted": "./assets/images/icons/ios-tinted.png"
+			}
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/images/icons/adaptive-icon.png",
+				"monochromeImage": "./assets/images/icons/adaptive-icon.png",
+				"backgroundColor": "#ffffff"
+			}
+		},
+		"web": {
+			"bundler": "metro",
+			"output": "static",
+			"favicon": "./assets/images/favicon.png"
+		},
+		"plugins": [
+			"expo-router",
+			[
+				"expo-splash-screen",
+				{
+					"image": "./assets/images/icons/splash-icon-dark.png",
+					"imageWidth": 200,
+					"resizeMode": "contain",
+					"backgoundColor": "#ffffff",
+					"dark": {
+						"image": "./assets/images/icons/splash-icon-light.png",
+						"backgroundColor": "#000000"
+					}
+				}
+			],
+			"expo-secure-store",
+			"expo-font"
+		],
+		"experiments": {
+			"typedRoutes": true
+		}
+	}
 }
