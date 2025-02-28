@@ -5,8 +5,8 @@
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint"
@@ -42,9 +42,7 @@
     "react-native-webview": "13.12.5",
     "expo-linear-gradient": "~14.0.2",
     "expo-navigation-bar": "~4.0.8",
-    "expo-font": "~13.0.4",
-    "expo-dev-client": "~5.0.12",
-    "expo-checkbox": "~4.0.1"
+    "expo-font": "~13.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
