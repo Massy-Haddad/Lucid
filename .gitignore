@@ -36,3 +36,10 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+# Ignore native directories (if you are using EAS Build)
+/android
+/ios
+
+# Ignore test coverage reports
+/coverage
