@@ -12,9 +12,10 @@ import { StatusBar } from 'expo-status-bar'
 import * as NavigationBar from 'expo-navigation-bar'
 
 import '../global.css'
-import { SessionProvider } from './ctx'
+import { SessionProvider } from '../context/AuthProvider'
 import * as SplashScreen from 'expo-splash-screen'
 import { useColorScheme } from '@/hooks/useColorScheme'
+import Splash from '@/components/Splash'
 
 export {
 	// Catch any errors thrown by the Layout component.
@@ -39,12 +40,14 @@ export default function RootLayout() {
 
 	useEffect(() => {
 		if (loaded || error) {
-			SplashScreen.hideAsync()
+			setTimeout(() => {
+				SplashScreen.hideAsync()
+			}, 1000)
 		}
 	}, [loaded, error])
 
 	if (!loaded && !error) {
-		return null
+		return <Splash />
 	}
 
 	return <RootLayoutNav />
@@ -72,8 +75,8 @@ function RootLayoutNav() {
 		<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
 			<SessionProvider>
 				<Slot />
-				<StatusBar style="auto" />
 			</SessionProvider>
+			<StatusBar style="auto" />
 		</ThemeProvider>
 	)
 }

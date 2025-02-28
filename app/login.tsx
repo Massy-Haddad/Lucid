@@ -6,7 +6,7 @@ import { BlurView } from 'expo-blur'
 import Checkbox from 'expo-checkbox'
 
 import '../global.css'
-import { useSession } from './ctx'
+import { useSession } from '@/context/AuthProvider'
 import { ThemedText } from '@/components/ThemedText'
 import { ThemedView } from '@/components/ThemedView'
 import { useColorScheme } from '@/hooks/useColorScheme.web'
