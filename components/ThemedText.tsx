@@ -37,14 +37,6 @@ export function ThemedText({
 	)
 }
 
-// const styles = StyleSheet.create({
-// 	default: {},
-// 	defaultSemiBold: {},
-// 	title: {},
-// 	subtitle: {},
-// 	link: {},
-// })
-
 const styles = StyleSheet.create({
 	default: {
 		fontSize: 14,

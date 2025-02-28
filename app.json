@@ -14,6 +14,10 @@
 				"light": "./assets/images/icons/ios-light.png",
 				"dark": "./assets/images/icons/ios-dark.png",
 				"tinted": "./assets/images/icons/ios-tinted.png"
+			},
+			"bundleIdentifier": "com.lucid",
+			"infoPlist": {
+				"ITSAppUsesNonExemptEncryption": false
 			}
 		},
 		"android": {
@@ -21,7 +25,8 @@
 				"foregroundImage": "./assets/images/icons/adaptive-icon.png",
 				"monochromeImage": "./assets/images/icons/adaptive-icon.png",
 				"backgroundColor": "#ffffff"
-			}
+			},
+			"package": "com.lucid"
 		},
 		"web": {
 			"bundler": "metro",
@@ -33,13 +38,13 @@
 			[
 				"expo-splash-screen",
 				{
-					"image": "./assets/images/icons/splash-icon-dark.png",
+					"image": "./assets/images/icons/splash-icon-light.png",
 					"imageWidth": 200,
 					"resizeMode": "contain",
-					"backgoundColor": "#ffffff",
+					"backgoundColor": "#000000",
 					"dark": {
-						"image": "./assets/images/icons/splash-icon-light.png",
-						"backgroundColor": "#000000"
+						"image": "./assets/images/icons/splash-icon-dark.png",
+						"backgroundColor": "#ffffff"
 					}
 				}
 			],
@@ -48,6 +53,15 @@
 		],
 		"experiments": {
 			"typedRoutes": true
-		}
+		},
+		"extra": {
+			"router": {
+				"origin": false
+			},
+			"eas": {
+				"projectId": "a97b2241-c05a-427b-967b-a9bdad80c6d6"
+			}
+		},
+		"owner": "haddadmassy"
 	}
 }
