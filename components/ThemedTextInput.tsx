@@ -49,13 +49,13 @@ export function ThemedTextInput({
 	)
 
 	return (
-		<View className="mb-4 flex-row items-center bg-white/10 p-2 rounded-xl border border-white/20 w-full">
+		<View className="mb-4 flex-row items-center bg-white/10 p-4 rounded-xl border border-white/20 w-full">
 			{icon && (
 				<Feather
 					name={icon}
 					size={iconSize}
 					color={iconColor}
-					className="mx-4"
+					className="ml-2 mr-4"
 				/>
 			)}
 			<TextInput

@@ -18,7 +18,8 @@
 			"bundleIdentifier": "com.lucid",
 			"infoPlist": {
 				"ITSAppUsesNonExemptEncryption": false
-			}
+			},
+			"googleServicesFile": "./GoogleService-Info.plist"
 		},
 		"android": {
 			"adaptiveIcon": {
@@ -26,7 +27,8 @@
 				"monochromeImage": "./assets/images/icons/adaptive-icon.png",
 				"backgroundColor": "#ffffff"
 			},
-			"package": "com.lucid"
+			"package": "com.lucid",
+			"googleServicesFile": "./google-services.json"
 		},
 		"web": {
 			"bundler": "metro",
@@ -49,7 +51,17 @@
 				}
 			],
 			"expo-secure-store",
-			"expo-font"
+			"expo-font",
+			[
+				"expo-build-properties",
+				{
+					"ios": {
+						"useFrameworks": "static"
+					}
+				}
+			],
+			"@react-native-firebase/app",
+			"@react-native-firebase/auth"
 		],
 		"experiments": {
 			"typedRoutes": true

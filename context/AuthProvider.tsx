@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useStorageState } from '@/hooks/useStorageState'
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth'
 
 const AuthContext = React.createContext<{
-	signIn: () => void
+	signIn: (email: string, password: string) => Promise<void>
 	signOut: () => void
-	session?: string | null
+	session?: FirebaseAuthTypes.User | null
 	isLoading: boolean
 }>({
-	signIn: () => null,
+	signIn: async () => {},
 	signOut: () => null,
 	session: null,
 	isLoading: false,
@@ -26,18 +27,32 @@ export function useSession() {
 }
 
 export function SessionProvider(props: React.PropsWithChildren) {
-	const [[isLoading, session], setSession] = useStorageState('session')
+	const [[isLoading, sessionData], setSessionData] = useStorageState('session')
+	const [session, setSession] = useState<FirebaseAuthTypes.User | null>(
+		sessionData ? JSON.parse(sessionData) : null
+	)
+
+	const updateSession = (user: FirebaseAuthTypes.User | null) => {
+		setSession(user)
+		setSessionData(user ? JSON.stringify(user) : null)
+	}
+
 	return (
 		<AuthContext.Provider
 			value={{
-				signIn: () => {
-					// Add your login logic here
-					// For example purposes, we'll just set a fake session in storage
-					//This likely would be a JWT token or other session data
-					setSession('Massy')
+				signIn: async (email: string, password: string) => {
+					try {
+						const userCredential: FirebaseAuthTypes.UserCredential =
+							await auth().signInWithEmailAndPassword(email, password)
+						updateSession(userCredential.user)
+					} catch (error) {
+						console.error(error)
+						throw error
+					}
 				},
+
 				signOut: () => {
-					setSession(null)
+					updateSession(null)
 				},
 				session,
 				isLoading,

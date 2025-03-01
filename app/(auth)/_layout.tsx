@@ -1,12 +1,13 @@
 import { Redirect, Stack } from 'expo-router'
 
+import Splash from '@/components/Splash'
 import { useSession } from '../../context/AuthProvider'
 
 export default function AppLayout() {
 	const { session, isLoading } = useSession()
 
 	if (isLoading) {
-		return null
+		return <Splash />
 	}
 
 	// Only require authentication within the (app) group's layout as users

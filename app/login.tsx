@@ -20,7 +20,7 @@ export default function LoginScreen() {
 	const { signIn } = useSession()
 
 	const handleLogin = () => {
-		signIn()
+		signIn(email, password)
 		router.replace('/')
 	}
 
@@ -61,7 +61,7 @@ export default function LoginScreen() {
 				</ThemedText>
 
 				<ThemedTextInput
-					icon="user"
+					icon="mail"
 					placeholder="Email"
 					value={email}
 					onChangeText={setEmail}
