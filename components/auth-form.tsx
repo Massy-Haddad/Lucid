@@ -133,7 +133,9 @@ export default function LoginForm({ mode }: LoginFormProps) {
 			)}
 
 			<TouchableOpacity
-				onPress={() => router.replace(mode === 'signin' ? '/signup' : '/login')}
+				onPress={() =>
+					router.replace(mode === 'signin' ? '/sign-up' : '/sign-in')
+				}
 			>
 				<ThemedText className="flex-1 justify-center items-center text-gray-300 text-sm text-center mt-8">
 					{mode === 'signin'

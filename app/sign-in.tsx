@@ -4,7 +4,7 @@ import '../global.css'
 import LoginForm from '@/components/auth-form'
 import { ThemedView } from '@/components/ThemedView'
 
-export default function LoginScreen() {
+export default function SignInScreen() {
 	return (
 		<ThemedView className="flex-1 justify-end items-center">
 			<View className="absolute top-1/4 -left-56 -mt-40">

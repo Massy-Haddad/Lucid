@@ -98,14 +98,6 @@ export function SessionProvider(props: React.PropsWithChildren) {
 						const userCredential: FirebaseAuthTypes.UserCredential =
 							await auth().signInWithEmailAndPassword(email.trim(), password)
 						updateSession(userCredential.user)
-						Toast.show({
-							type: 'success',
-							text1: 'Success',
-							text2: 'Successfully logged in',
-							position: 'bottom',
-							visibilityTime: 2000,
-							autoHide: true,
-						})
 						router.replace('/')
 					} catch (error: any) {
 						let errorMessage = 'An error occurred during login'
@@ -201,7 +193,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
 							visibilityTime: 2000,
 							autoHide: true,
 						})
-						router.replace('/login')
+						router.replace('/sign-in')
 					} catch (error) {
 						showError('Error', 'Failed to sign out')
 					} finally {
