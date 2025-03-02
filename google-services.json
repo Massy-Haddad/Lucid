@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "824960814094",
+    "project_id": "lucid-quotes",
+    "storage_bucket": "lucid-quotes.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:824960814094:android:d1f9be23b30bdab8eec05f",
+        "android_client_info": {
+          "package_name": "com.lucid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "824960814094-j9p59fd2raj9soe9lcg2n1va1o1f25e0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lucid",
+            "certificate_hash": "f3d868c603cf1ae32ec2d7bbcd70dc82db8b7d58"
+          }
+        },
+        {
+          "client_id": "824960814094-f1rg35dqho9j654bistj0n0gjrhvrr6a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMiqX8qFGGDao8o0S0qeYYp74UB_4W9Gg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "824960814094-f1rg35dqho9j654bistj0n0gjrhvrr6a.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "824960814094-60g4cqk23dfpmnc9rb3nsjdgvirvgh9e.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.lucid"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
