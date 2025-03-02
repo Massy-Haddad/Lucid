@@ -5,14 +5,13 @@ import {
 } from '@react-navigation/native'
 import 'react-native-reanimated'
 import { useEffect } from 'react'
-import { Slot, Stack } from 'expo-router'
+import { Slot } from 'expo-router'
 import { useFonts } from 'expo-font'
 import * as SystemUI from 'expo-system-ui'
 import { StatusBar } from 'expo-status-bar'
 import Toast from 'react-native-toast-message'
 import * as NavigationBar from 'expo-navigation-bar'
 
-import '../global.css'
 import { SessionProvider } from '../context/AuthProvider'
 import * as SplashScreen from 'expo-splash-screen'
 import { useColorScheme } from '@/hooks/useColorScheme'
@@ -25,7 +24,7 @@ export {
 } from 'expo-router'
 
 export const unstable_settings = {
-	initialRouteName: 'login',
+	initialRouteName: '/auth',
 }
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.

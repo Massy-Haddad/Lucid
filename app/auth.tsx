@@ -1,10 +1,14 @@
 import { View, Text, Image } from 'react-native'
+import { useLocalSearchParams } from 'expo-router'
 
-import '../global.css'
 import LoginForm from '@/components/auth-form'
 import { ThemedView } from '@/components/ThemedView'
 
-export default function SignInScreen() {
+export default function AuthScreen() {
+	const { mode = 'signin' } = useLocalSearchParams<{
+		mode: 'signin' | 'signup'
+	}>()
+
 	return (
 		<ThemedView className="flex-1 justify-end items-center">
 			<View className="absolute top-1/4 -left-56 -mt-40">
@@ -23,9 +27,9 @@ export default function SignInScreen() {
 				style={{ fontFamily: 'Against' }}
 				className="text-white text-3xl text-center my-16"
 			>
-				LOGIN TO{'\n'}YOUR ACCOUNT
+				{mode === 'signin' ? 'LOGIN TO\nYOUR ACCOUNT' : 'CREATE\nYOUR ACCOUNT'}
 			</Text>
-			<LoginForm mode="signin" />
+			<LoginForm mode={mode} />
 		</ThemedView>
 	)
 }

@@ -193,7 +193,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
 							visibilityTime: 2000,
 							autoHide: true,
 						})
-						router.replace('/sign-in')
+						router.replace('/auth?mode=signin')
 					} catch (error) {
 						showError('Error', 'Failed to sign out')
 					} finally {
