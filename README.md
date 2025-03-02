@@ -1,50 +1,184 @@
-# Welcome to your Expo app 👋
+# Lucid
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A modern React Native application built with Expo and Firebase Authentication.
 
-## Get started
+## Prerequisites
 
-1. Install dependencies
+Before you begin, ensure you have the following installed:
+- [Node.js](https://nodejs.org/) (LTS version recommended)
+- [Git](https://git-scm.com/)
+- [Expo CLI](https://docs.expo.dev/get-started/installation/)
+- [Android Studio](https://developer.android.com/studio) (for Android development)
+- [Xcode](https://developer.apple.com/xcode/) (for iOS development, macOS only)
 
-   ```bash
-   npm install
-   ```
+## Setting Up Android Development Environment
 
-2. Start the app
+1. Install Android Studio
+2. Install the following through Android Studio's SDK Manager:
+   - Android SDK Platform (API level 33 or newer recommended)
+   - Android SDK Build-Tools
+   - Android Emulator
+   - Android SDK Platform-Tools
 
-   ```bash
-    npx expo start
-   ```
+3. Create an Android Virtual Device (AVD):
+   - Open Android Studio → Tools → Device Manager
+   - Click "Create Device"
+   - Select a device definition (e.g., Pixel 6)
+   - Select a system image (e.g., API 33)
+   - Complete the AVD creation
 
-In the output, you'll find options to open the app in a
+## Project Setup
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+1. Clone the repository:
 ```bash
-npm run reset-project
+git clone [your-repository-url]
+cd lucid
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Install dependencies:
+```bash
+npm install
+```
 
-## Learn more
+3. Set up Firebase:
+   - Go to [Firebase Console](https://console.firebase.google.com/)
+   - Create a new project
+   - Add Android and iOS apps to your project
+   - Download the configuration files:
+     - `google-services.json` for Android
+     - `GoogleService-Info.plist` for iOS
+   - Place these files in the project root
 
-To learn more about developing your project with Expo, look at the following resources:
+4. Configure Firebase in your project:
+   - Visit [React Native Firebase](https://rnfirebase.io/) for detailed setup
+   - Follow the installation guides for each Firebase service you need
+   - Ensure you've added all necessary Firebase dependencies
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Running the Project
 
-## Join the community
+### Development
 
-Join our community of developers creating universal apps.
+1. Start the development server:
+```bash
+npx expo start
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+2. Run on Android:
+```bash
+# First time setup
+npx expo prebuild --clean
+npx expo run:android
+```
+
+3. Run on iOS (macOS only):
+```bash
+# First time setup
+npx expo prebuild --clean
+npx expo run:ios
+```
+
+### Production Build
+
+1. Android:
+```bash
+eas build --platform android
+```
+
+2. iOS:
+```bash
+eas build --platform ios
+```
+
+## Project Structure
+
+```
+lucid/
+├── app/                   # App screens using Expo Router
+├── assets/               # Static assets (images, fonts)
+├── components/           # Reusable React components
+├── context/             # React Context providers
+├── hooks/               # Custom React hooks
+└── types/               # TypeScript type definitions
+```
+
+## Key Features
+
+- 🔐 Firebase Authentication
+- 🎨 Dark/Light theme support
+- 🎯 TypeScript support
+- 📱 Responsive design
+- 🔄 State management with React Context
+- 🚀 Fast refresh in development
+
+## Firebase Setup Details
+
+1. Install required dependencies:
+```bash
+npx expo install @react-native-firebase/app @react-native-firebase/auth
+```
+
+2. Initialize Firebase in your app:
+```typescript
+import '@react-native-firebase/app';
+import auth from '@react-native-firebase/auth';
+```
+
+3. Configure build properties in `app.json`:
+```json
+{
+  "expo": {
+    "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth"
+    ],
+    "android": {
+      "googleServicesFile": "./google-services.json"
+    },
+    "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist"
+    }
+  }
+}
+```
+
+## Common Issues and Solutions
+
+### Android Build Issues
+
+1. Clean the project:
+```bash
+cd android
+./gradlew clean
+cd ..
+```
+
+2. Reset Expo cache:
+```bash
+npx expo start --clear
+```
+
+### iOS Build Issues
+
+1. Clean the pods:
+```bash
+cd ios
+pod deintegrate
+pod install
+cd ..
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For support, email [your-email] or open an issue in the repository.
