@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { router } from 'expo-router'
-import { FontAwesome } from '@expo/vector-icons'
-import { View, Text, Image, TouchableOpacity } from 'react-native'
 import { BlurView } from 'expo-blur'
 import Checkbox from 'expo-checkbox'
+import { FontAwesome } from '@expo/vector-icons'
+import { View, Text, Image, TouchableOpacity } from 'react-native'
 
 import '../global.css'
 import { useSession } from '@/context/AuthProvider'
@@ -16,12 +16,19 @@ export default function LoginScreen() {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 	const [isChecked, setChecked] = useState(false)
+	const { signIn, session, isLoading: isSessionLoading } = useSession()
 
-	const { signIn } = useSession()
+	const handleLogin = async () => {
+		try {
+			await signIn(email, password)
+		} catch (error) {
+			console.log(error)
+		}
+	}
 
-	const handleLogin = () => {
-		signIn(email, password)
-		router.replace('/')
+	const handleSignInPress = async () => {
+		await handleLogin()
+		if (!isSessionLoading) router.replace('/')
 	}
 
 	const colorScheme = useColorScheme()
@@ -91,7 +98,7 @@ export default function LoginScreen() {
 				</View>
 
 				<TouchableOpacity
-					onPress={() => handleLogin()}
+					onPress={() => handleSignInPress()}
 					className="bg-blue-500 p-4 rounded-xl w-full flex-row justify-center items-center mb-4"
 				>
 					<ThemedText type="subtitle" className="text-white font-semibold">

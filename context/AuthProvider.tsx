@@ -1,6 +1,26 @@
 import React, { useState } from 'react'
+import { Alert } from 'react-native'
 import { useStorageState } from '@/hooks/useStorageState'
+import '@react-native-firebase/app'
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth'
+
+const validateCredentials = (
+	email: string,
+	password: string
+): { isValid: boolean; error?: string } => {
+	if (!email.trim()) {
+		return { isValid: false, error: 'Please enter your email' }
+	}
+	if (!password.trim()) {
+		return { isValid: false, error: 'Please enter your password' }
+	}
+	// Basic email validation
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+	if (!emailRegex.test(email.trim())) {
+		return { isValid: false, error: 'Please enter a valid email address' }
+	}
+	return { isValid: true }
+}
 
 const AuthContext = React.createContext<{
 	signIn: (email: string, password: string) => Promise<void>
@@ -41,17 +61,52 @@ export function SessionProvider(props: React.PropsWithChildren) {
 		<AuthContext.Provider
 			value={{
 				signIn: async (email: string, password: string) => {
+					const validation = validateCredentials(email, password)
+					if (!validation.isValid) {
+						Alert.alert('Validation Error', validation.error)
+						throw new Error(validation.error)
+					}
+
 					try {
 						const userCredential: FirebaseAuthTypes.UserCredential =
-							await auth().signInWithEmailAndPassword(email, password)
+							await auth().signInWithEmailAndPassword(email.trim(), password)
 						updateSession(userCredential.user)
-					} catch (error) {
-						console.error(error)
+					} catch (error: any) {
+						let errorMessage = 'An error occurred during login'
+
+						// Firebase auth errors
+						switch (error.code) {
+							case 'auth/invalid-email':
+								errorMessage = 'Invalid email address'
+								break
+							case 'auth/user-disabled':
+								errorMessage = 'This account has been disabled'
+								break
+							case 'auth/user-not-found':
+								errorMessage = 'No account found with this email'
+								break
+							case 'auth/wrong-password':
+								errorMessage = 'Incorrect password'
+								break
+							case 'auth/too-many-requests':
+								errorMessage =
+									'Too many failed attempts. Please try again later'
+								break
+							case 'auth/network-request-failed':
+								errorMessage = 'Network error. Please check your connection'
+								break
+						}
+
+						Alert.alert('Login Error', errorMessage)
 						throw error
 					}
 				},
-
 				signOut: () => {
+					auth()
+						.signOut()
+						.then(() => {
+							console.log('Signed out')
+						})
 					updateSession(null)
 				},
 				session,
