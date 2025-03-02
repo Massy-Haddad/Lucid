@@ -3,6 +3,7 @@ import { Alert } from 'react-native'
 import { useStorageState } from '@/hooks/useStorageState'
 import '@react-native-firebase/app'
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth'
+import { router } from 'expo-router'
 
 const validateCredentials = (
 	email: string,
@@ -47,10 +48,11 @@ export function useSession() {
 }
 
 export function SessionProvider(props: React.PropsWithChildren) {
-	const [[isLoading, sessionData], setSessionData] = useStorageState('session')
+	const [[, sessionData], setSessionData] = useStorageState('session')
 	const [session, setSession] = useState<FirebaseAuthTypes.User | null>(
 		sessionData ? JSON.parse(sessionData) : null
 	)
+	const [isLoading, setIsLoading] = useState(false)
 
 	const updateSession = (user: FirebaseAuthTypes.User | null) => {
 		setSession(user)
@@ -68,9 +70,11 @@ export function SessionProvider(props: React.PropsWithChildren) {
 					}
 
 					try {
+						setIsLoading(true)
 						const userCredential: FirebaseAuthTypes.UserCredential =
 							await auth().signInWithEmailAndPassword(email.trim(), password)
 						updateSession(userCredential.user)
+						router.replace('/')
 					} catch (error: any) {
 						let errorMessage = 'An error occurred during login'
 
@@ -99,15 +103,18 @@ export function SessionProvider(props: React.PropsWithChildren) {
 
 						Alert.alert('Login Error', errorMessage)
 						throw error
+					} finally {
+						setIsLoading(false)
 					}
 				},
-				signOut: () => {
-					auth()
-						.signOut()
-						.then(() => {
-							console.log('Signed out')
-						})
-					updateSession(null)
+				signOut: async () => {
+					try {
+						setIsLoading(true)
+						await auth().signOut()
+						updateSession(null)
+					} finally {
+						setIsLoading(false)
+					}
 				},
 				session,
 				isLoading,
