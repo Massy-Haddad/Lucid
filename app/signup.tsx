@@ -4,7 +4,7 @@ import '../global.css'
 import LoginForm from '@/components/auth-form'
 import { ThemedView } from '@/components/ThemedView'
 
-export default function LoginScreen() {
+export default function SignUpScreen() {
 	return (
 		<ThemedView className="flex-1 justify-end items-center">
 			<View className="absolute top-1/4 -left-56 -mt-40">
@@ -23,9 +23,9 @@ export default function LoginScreen() {
 				style={{ fontFamily: 'Against' }}
 				className="text-white text-3xl text-center my-16"
 			>
-				LOGIN TO{'\n'}YOUR ACCOUNT
+				CREATE{'\n'}YOUR ACCOUNT
 			</Text>
-			<LoginForm mode="signin" />
+			<LoginForm mode="signup" />
 		</ThemedView>
 	)
 }

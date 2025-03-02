@@ -5,10 +5,11 @@ import {
 } from '@react-navigation/native'
 import 'react-native-reanimated'
 import { useEffect } from 'react'
-import { Slot } from 'expo-router'
+import { Slot, Stack } from 'expo-router'
 import { useFonts } from 'expo-font'
 import * as SystemUI from 'expo-system-ui'
 import { StatusBar } from 'expo-status-bar'
+import Toast from 'react-native-toast-message'
 import * as NavigationBar from 'expo-navigation-bar'
 
 import '../global.css'
@@ -16,6 +17,7 @@ import { SessionProvider } from '../context/AuthProvider'
 import * as SplashScreen from 'expo-splash-screen'
 import { useColorScheme } from '@/hooks/useColorScheme'
 import Splash from '@/components/Splash'
+import { toastConfig } from '@/components/ui/CustomToast'
 
 export {
 	// Catch any errors thrown by the Layout component.
@@ -65,8 +67,8 @@ function RootLayoutNav() {
 
 			// set the color of UI background
 			if (colorScheme === 'light') {
-				await SystemUI.setBackgroundColorAsync('white')
-			} else await SystemUI.setBackgroundColorAsync('black')
+				await SystemUI.setBackgroundColorAsync('#FFFFFF')
+			} else await SystemUI.setBackgroundColorAsync('#000000')
 		}
 		fetchColor()
 	}, [])
@@ -77,6 +79,7 @@ function RootLayoutNav() {
 				<Slot />
 			</SessionProvider>
 			<StatusBar style="auto" />
+			<Toast config={toastConfig} />
 		</ThemeProvider>
 	)
 }

@@ -1,9 +1,14 @@
 import React, { useState } from 'react'
-import { Alert } from 'react-native'
-import { useStorageState } from '@/hooks/useStorageState'
-import '@react-native-firebase/app'
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth'
 import { router } from 'expo-router'
+import { LogBox } from 'react-native'
+import Toast from 'react-native-toast-message'
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth'
+import '@react-native-firebase/app'
+
+import { useStorageState } from '@/hooks/useStorageState'
+
+// Ignore NOBRIDGE warnings
+LogBox.ignoreLogs(['(NOBRIDGE)'])
 
 const validateCredentials = (
 	email: string,
@@ -25,11 +30,13 @@ const validateCredentials = (
 
 const AuthContext = React.createContext<{
 	signIn: (email: string, password: string) => Promise<void>
+	signUp: (email: string, password: string) => Promise<void>
 	signOut: () => void
 	session?: FirebaseAuthTypes.User | null
 	isLoading: boolean
 }>({
 	signIn: async () => {},
+	signUp: async () => {},
 	signOut: () => null,
 	session: null,
 	isLoading: false,
@@ -59,13 +66,30 @@ export function SessionProvider(props: React.PropsWithChildren) {
 		setSessionData(user ? JSON.stringify(user) : null)
 	}
 
+	const showError = (title: string, message: string) => {
+		// Only log in development
+		if (__DEV__) {
+			// Using console.warn instead of error to avoid NOBRIDGE
+			console.warn(`${title}: ${message}`)
+		}
+
+		Toast.show({
+			type: 'error',
+			text1: title,
+			text2: message,
+			position: 'bottom',
+			visibilityTime: 4000,
+			autoHide: true,
+		})
+	}
+
 	return (
 		<AuthContext.Provider
 			value={{
 				signIn: async (email: string, password: string) => {
 					const validation = validateCredentials(email, password)
 					if (!validation.isValid) {
-						Alert.alert('Validation Error', validation.error)
+						showError('Validation Error', validation.error || '')
 						throw new Error(validation.error)
 					}
 
@@ -74,6 +98,14 @@ export function SessionProvider(props: React.PropsWithChildren) {
 						const userCredential: FirebaseAuthTypes.UserCredential =
 							await auth().signInWithEmailAndPassword(email.trim(), password)
 						updateSession(userCredential.user)
+						Toast.show({
+							type: 'success',
+							text1: 'Success',
+							text2: 'Successfully logged in',
+							position: 'bottom',
+							visibilityTime: 2000,
+							autoHide: true,
+						})
 						router.replace('/')
 					} catch (error: any) {
 						let errorMessage = 'An error occurred during login'
@@ -101,7 +133,56 @@ export function SessionProvider(props: React.PropsWithChildren) {
 								break
 						}
 
-						Alert.alert('Login Error', errorMessage)
+						showError('Error', errorMessage)
+						throw error
+					} finally {
+						setIsLoading(false)
+					}
+				},
+				signUp: async (email: string, password: string) => {
+					const validation = validateCredentials(email, password)
+					if (!validation.isValid) {
+						showError('Validation Error', validation.error || '')
+						throw new Error(validation.error)
+					}
+
+					try {
+						setIsLoading(true)
+						const userCredential: FirebaseAuthTypes.UserCredential =
+							await auth().createUserWithEmailAndPassword(
+								email.trim(),
+								password
+							)
+						updateSession(userCredential.user)
+						Toast.show({
+							type: 'success',
+							text1: 'Success',
+							text2: 'Account created successfully',
+							position: 'bottom',
+							visibilityTime: 2000,
+							autoHide: true,
+						})
+						router.replace('/')
+					} catch (error: any) {
+						let errorMessage = 'An error occurred during signup'
+
+						// Firebase auth errors
+						switch (error.code) {
+							case 'auth/email-already-in-use':
+								errorMessage = 'This email is already registered'
+								break
+							case 'auth/invalid-email':
+								errorMessage = 'Invalid email address'
+								break
+							case 'auth/operation-not-allowed':
+								errorMessage = 'Email/password accounts are not enabled'
+								break
+							case 'auth/weak-password':
+								errorMessage = 'Password is too weak'
+								break
+						}
+
+						showError('Error', errorMessage)
 						throw error
 					} finally {
 						setIsLoading(false)
@@ -112,6 +193,17 @@ export function SessionProvider(props: React.PropsWithChildren) {
 						setIsLoading(true)
 						await auth().signOut()
 						updateSession(null)
+						Toast.show({
+							type: 'success',
+							text1: 'Success',
+							text2: 'Successfully logged out',
+							position: 'bottom',
+							visibilityTime: 2000,
+							autoHide: true,
+						})
+						router.replace('/login')
+					} catch (error) {
+						showError('Error', 'Failed to sign out')
 					} finally {
 						setIsLoading(false)
 					}

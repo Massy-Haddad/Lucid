@@ -20,8 +20,10 @@ export default function HomeScreen() {
 			}
 		>
 			<ThemedView style={styles.titleContainer}>
-				<ThemedText type="title">Welcome {'\n' + session?.email}</ThemedText>
-				<HelloWave />
+				<ThemedText type="title">
+					Welcome <HelloWave />
+					{'\n' + session?.email?.split('@')[0]}
+				</ThemedText>
 			</ThemedView>
 			<ThemedView style={styles.stepContainer}>
 				<ThemedText type="subtitle">Step 1: Try it</ThemedText>
