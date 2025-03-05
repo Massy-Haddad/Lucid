@@ -5,22 +5,22 @@ import {
 } from '@react-navigation/native'
 import 'react-native-reanimated'
 import { useEffect } from 'react'
-import { Image, TouchableOpacity, View } from 'react-native'
+import { Stack } from 'expo-router'
 import { useFonts } from 'expo-font'
-import { router, Slot, Stack } from 'expo-router'
 import * as SystemUI from 'expo-system-ui'
 import { StatusBar } from 'expo-status-bar'
+import { Feather } from '@expo/vector-icons'
 import Toast from 'react-native-toast-message'
+import * as SplashScreen from 'expo-splash-screen'
 import * as NavigationBar from 'expo-navigation-bar'
+import { Image, TouchableOpacity, View } from 'react-native'
 
 import Splash from '@/components/Splash'
-import * as SplashScreen from 'expo-splash-screen'
-import { useColorScheme } from '@/hooks/useColorScheme'
-import { toastConfig } from '@/components/ui/CustomToast'
-import { QuotesProvider } from '@/context/QuotesContext'
-import { SessionProvider, useSession } from '../context/AuthProvider'
-import { Feather } from '@expo/vector-icons'
 import { ThemedText } from '@/components/ThemedText'
+import { useColorScheme } from '@/hooks/useColorScheme'
+import { QuotesProvider } from '@/context/QuotesContext'
+import { toastConfig } from '@/components/ui/CustomToast'
+import { SessionProvider, useSession } from '@/context/AuthProvider'
 
 export {
 	// Catch any errors thrown by the Layout component.
@@ -105,14 +105,9 @@ function RootLayoutNav() {
 							name="(home)"
 							options={{
 								headerLeft: () => (
-									<Image
-										source={
-											colorScheme === 'dark'
-												? require('@/assets/images/icons/splash-icon-light.png')
-												: require('@/assets/images/icons/splash-icon-dark.png')
-										}
-										style={{ width: 60, height: 60, resizeMode: 'contain' }}
-									/>
+									<TouchableOpacity>
+										<Feather name="user" size={30} color="white" />
+									</TouchableOpacity>
 								),
 								headerRight: () => <HeaderRight />,
 								headerTitle: () => (

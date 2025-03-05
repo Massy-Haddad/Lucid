@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { StyleSheet, View, Text, ImageBackground } from 'react-native'
+import { View, Text, ImageBackground } from 'react-native'
 import Swiper from 'react-native-deck-swiper'
 import { QuoteCard } from '@/components/QuoteCard'
 import { useQuotes } from '@/context/QuotesContext'
@@ -17,8 +17,8 @@ export default function AnimeQuotesScreen() {
 
 	if (isLoading && animeQuotes.length === 0) {
 		return (
-			<View style={styles.container}>
-				<Text style={{ color: Colors[colorScheme ?? 'light'].tint }}>
+			<View className="flex-1 justify-center items-center">
+				<Text className={colorScheme === 'dark' ? 'text-white' : 'text-black'}>
 					Loading quotes...
 				</Text>
 			</View>
@@ -27,8 +27,8 @@ export default function AnimeQuotesScreen() {
 
 	if (!isLoading && animeQuotes.length === 0) {
 		return (
-			<View style={styles.container}>
-				<Text style={{ color: Colors[colorScheme ?? 'light'].tint }}>
+			<View className="flex-1 justify-center items-center">
+				<Text className={colorScheme === 'dark' ? 'text-white' : 'text-black'}>
 					No quotes available. Pull to refresh.
 				</Text>
 			</View>
@@ -36,13 +36,13 @@ export default function AnimeQuotesScreen() {
 	}
 
 	return (
-		<View style={styles.container}>
+		<View className="flex-1">
 			<ImageBackground
 				source={require('@/assets/images/bg1.jpg')}
-				style={styles.backgroundImage}
+				className="flex-1 w-full h-full"
 				blurRadius={3}
 			>
-				<View style={styles.overlay}>
+				<View className="flex-1 bg-black/30">
 					<Swiper<Quote>
 						cards={animeQuotes}
 						renderCard={(quote) => {
@@ -100,18 +100,3 @@ export default function AnimeQuotesScreen() {
 		</View>
 	)
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-	backgroundImage: {
-		flex: 1,
-		width: '100%',
-		height: '100%',
-	},
-	overlay: {
-		flex: 1,
-		backgroundColor: 'rgba(0,0,0,0.3)',
-	},
-})

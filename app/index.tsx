@@ -24,7 +24,7 @@ const Welcome = () => {
 				<View className="w-full flex justify-center items-center h-full px-4">
 					<Image
 						source={require('@/assets/images/icons/splash-icon-light.png')}
-						className="max-w-[380px] w-full h-[298px]"
+						className="max-w-[200px] w-full h-[200px]"
 						resizeMode="contain"
 					/>
 
