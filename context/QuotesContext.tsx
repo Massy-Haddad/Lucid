@@ -1,206 +1,198 @@
-import React, { createContext, useContext, useState, useCallback } from 'react'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import api from '@/api'
 import { Quote } from '@/types/quote'
-
-interface QuoteResponse {
-	_id: string
-	content: string
-	author: string
-	authorSlug: string
-	length: number
-	tags: string[]
-}
 
 interface QuotesContextType {
 	movieQuotes: Quote[]
 	animeQuotes: Quote[]
 	savedQuotes: Quote[]
 	isLoading: boolean
-	error: string | null
-	currentPage: number
-	fetchMovieQuotes: () => Promise<void>
-	fetchAnimeQuotes: () => Promise<void>
-	saveQuote: (quote: Quote) => Promise<void>
-	removeQuote: (quoteId: string) => Promise<void>
-	loadSavedQuotes: () => Promise<void>
+	isLoadingMore: boolean
+	fetchMovieQuotes: (force?: boolean) => Promise<void>
+	fetchAnimeQuotes: (force?: boolean) => Promise<void>
+	saveQuote: (quote: Quote) => void
+	removeQuote: (id: string) => void
+	currentQuoteIndex: number
+	setCurrentQuoteIndex: (index: number) => void
 }
 
-const QuotesContext = createContext<QuotesContextType | undefined>(undefined)
+const QuotesContext = createContext<QuotesContextType>({} as QuotesContextType)
 
 export function QuotesProvider({ children }: { children: React.ReactNode }) {
 	const [movieQuotes, setMovieQuotes] = useState<Quote[]>([])
 	const [animeQuotes, setAnimeQuotes] = useState<Quote[]>([])
 	const [savedQuotes, setSavedQuotes] = useState<Quote[]>([])
 	const [isLoading, setIsLoading] = useState(false)
-	const [error, setError] = useState<string | null>(null)
-	const [currentPage, setCurrentPage] = useState(1)
+	const [isLoadingMore, setIsLoadingMore] = useState(false)
+	const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0)
 
-	const fetchMovieQuotes = useCallback(async () => {
-		setIsLoading(true)
-		setError(null)
+	const fetchMovieQuotes = async (force: boolean = false) => {
 		try {
-			console.log('Fetching movie quotes...')
-			const response = await fetch(
-				'https://api.quotable.io/quotes/random?limit=10&tags=famous-quotes,inspirational',
-				{
-					method: 'GET',
-					headers: {
-						Accept: 'application/json',
-						'Content-Type': 'application/json',
+			// Only fetch if we're running low on quotes or forced
+			if (!force && movieQuotes.length > currentQuoteIndex + 5) {
+				return
+			}
+
+			if (movieQuotes.length === 0) {
+				setIsLoading(true)
+			} else {
+				setIsLoadingMore(true)
+			}
+
+			const response = await api.ninjas.getRandomQuotes({ count: 5 })
+
+			setMovieQuotes((prevQuotes) => {
+				const newQuotes = response.filter(
+					(newQuote) =>
+						!prevQuotes.some((prevQuote) => prevQuote.text === newQuote.text)
+				)
+				return movieQuotes.length === 0
+					? newQuotes
+					: [...prevQuotes, ...newQuotes]
+			})
+		} catch (error) {
+			console.error('Error fetching movie quotes:', error)
+			if (movieQuotes.length === 0) {
+				setMovieQuotes([
+					{
+						id: 'fallback-movie-1',
+						text: 'Do, or do not. There is no try.',
+						author: 'Yoda',
+						source: 'Star Wars: The Empire Strikes Back',
+						type: 'movie',
 					},
-				}
-			)
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`)
+					{
+						id: 'fallback-movie-2',
+						text: "I'll be back.",
+						author: 'The Terminator',
+						source: 'The Terminator',
+						type: 'movie',
+					},
+				])
 			}
-			const data: QuoteResponse[] = await response.json()
-			console.log('Movie quotes response:', data)
-
-			if (!Array.isArray(data)) {
-				throw new Error('Invalid response format')
-			}
-
-			const formattedQuotes: Quote[] = data.map((quote) => ({
-				id: quote._id,
-				text: quote.content,
-				source: quote.tags[0] || 'Famous Quote',
-				author: quote.author,
-				type: 'movie' as const,
-			}))
-
-			console.log('Formatted movie quotes:', formattedQuotes)
-			setMovieQuotes((prev) => [...prev, ...formattedQuotes])
-		} catch (err) {
-			console.error('Error fetching movie quotes:', err)
-			setError('Failed to fetch movie quotes')
-			// Fallback to static quotes if API fails
-			const fallbackQuotes: Quote[] = [
-				{
-					id: '1',
-					text: "Life is like a box of chocolates, you never know what you're gonna get.",
-					source: 'Famous Quote',
-					author: 'Forrest Gump',
-					type: 'movie',
-				},
-				{
-					id: '2',
-					text: 'May the Force be with you.',
-					source: 'Famous Quote',
-					author: 'Star Wars',
-					type: 'movie',
-				},
-			]
-			setMovieQuotes(fallbackQuotes)
 		} finally {
 			setIsLoading(false)
+			setIsLoadingMore(false)
 		}
-	}, [])
+	}
 
-	const fetchAnimeQuotes = useCallback(async () => {
-		setIsLoading(true)
-		setError(null)
+	const fetchAnimeQuotes = async (force: boolean = false) => {
 		try {
-			console.log('Fetching anime quotes...')
-			const response = await fetch(
-				'https://api.quotable.io/quotes/random?limit=10&tags=wisdom',
-				{
-					method: 'GET',
-					headers: {
-						Accept: 'application/json',
-						'Content-Type': 'application/json',
+			// Only fetch if we're running low on quotes or forced
+			if (!force && animeQuotes.length > currentQuoteIndex + 2) {
+				return
+			}
+
+			if (animeQuotes.length === 0) {
+				setIsLoading(true)
+			} else {
+				setIsLoadingMore(true)
+			}
+
+			// Fetch more quotes since we'll filter some out
+			const response = await api.ninjas.getRandomQuotes({ count: 0 })
+
+			// Filter quotes that are more likely to be anime-like
+			// Look for quotes that are philosophical, about life, friendship, or contain certain keywords
+			const animelikeQuotes = response
+				.filter((quote) => {
+					const lowerText = quote.text.toLowerCase()
+					const lowerAuthor = quote.author.toLowerCase()
+
+					// Keywords that might indicate an anime-like quote
+					const keywords = [
+						'life',
+						'dream',
+						'destiny',
+						'heart',
+						'soul',
+						'spirit',
+						'power',
+						'strength',
+						'courage',
+						'friend',
+						'hope',
+						'future',
+						'fate',
+						'journey',
+						'warrior',
+						'hero',
+						'believe',
+						'faith',
+						'path',
+						'wisdom',
+					]
+
+					// Check if the quote contains any of our keywords
+					return keywords.some(
+						(keyword) =>
+							lowerText.includes(keyword) || lowerAuthor.includes(keyword)
+					)
+				})
+				.map((quote) => ({
+					...quote,
+					type: 'anime' as const,
+				}))
+
+			setAnimeQuotes((prevQuotes) => {
+				const newQuotes = animelikeQuotes.filter(
+					(newQuote) =>
+						!prevQuotes.some((prevQuote) => prevQuote.text === newQuote.text)
+				)
+				return animeQuotes.length === 0
+					? newQuotes
+					: [...prevQuotes, ...newQuotes]
+			})
+		} catch (error) {
+			console.error('Error fetching anime quotes:', error)
+			if (animeQuotes.length === 0) {
+				setAnimeQuotes([
+					{
+						id: 'fallback-anime-1',
+						text: 'People die if they are killed.',
+						author: 'Shirou Emiya',
+						source: 'Fate/Stay Night',
+						type: 'anime',
 					},
-				}
-			)
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`)
+					{
+						id: 'fallback-anime-2',
+						text: 'Believe in the me that believes in you!',
+						author: 'Kamina',
+						source: 'Gurren Lagann',
+						type: 'anime',
+					},
+					{
+						id: 'fallback-anime-3',
+						text: 'I am the bone of my sword.',
+						author: 'Archer',
+						source: 'Fate/Stay Night',
+						type: 'anime',
+					},
+				])
 			}
-			const data = await response.json()
-			console.log('Anime quotes response:', data)
-
-			if (!Array.isArray(data)) {
-				throw new Error('Invalid response format')
-			}
-
-			const formattedQuotes: Quote[] = data.map((quote: any) => ({
-				id: quote._id || String(Date.now()),
-				text: quote.content,
-				source: 'Anime Wisdom',
-				author: quote.author,
-				type: 'anime' as const,
-			}))
-
-			console.log('Formatted anime quotes:', formattedQuotes)
-			setAnimeQuotes((prev) => [...prev, ...formattedQuotes])
-		} catch (err) {
-			console.error('Error fetching anime quotes:', err)
-			setError('Failed to fetch anime quotes')
-			// Fallback to static quotes if API fails
-			const fallbackQuotes: Quote[] = [
-				{
-					id: '1',
-					text: "People's lives don't end when they die, it ends when they lose faith.",
-					source: 'Anime',
-					author: 'Itachi Uchiha',
-					type: 'anime',
-				},
-				{
-					id: '2',
-					text: "If you don't like your destiny, don't accept it.",
-					source: 'Anime',
-					author: 'Naruto Uzumaki',
-					type: 'anime',
-				},
-			]
-			setAnimeQuotes(fallbackQuotes)
 		} finally {
 			setIsLoading(false)
+			setIsLoadingMore(false)
 		}
-	}, [])
+	}
 
-	const saveQuote = useCallback(
-		async (quote: Quote) => {
-			try {
-				const updatedSavedQuotes = [...savedQuotes, quote]
-				setSavedQuotes(updatedSavedQuotes)
-				await AsyncStorage.setItem(
-					'savedQuotes',
-					JSON.stringify(updatedSavedQuotes)
-				)
-			} catch (err) {
-				console.error('Error saving quote:', err)
-			}
-		},
-		[savedQuotes]
-	)
-
-	const removeQuote = useCallback(
-		async (quoteId: string) => {
-			try {
-				const updatedSavedQuotes = savedQuotes.filter(
-					(quote) => quote.id !== quoteId
-				)
-				setSavedQuotes(updatedSavedQuotes)
-				await AsyncStorage.setItem(
-					'savedQuotes',
-					JSON.stringify(updatedSavedQuotes)
-				)
-			} catch (err) {
-				console.error('Error removing quote:', err)
-			}
-		},
-		[savedQuotes]
-	)
-
-	const loadSavedQuotes = useCallback(async () => {
-		try {
-			const savedQuotesString = await AsyncStorage.getItem('savedQuotes')
-			if (savedQuotesString) {
-				setSavedQuotes(JSON.parse(savedQuotesString))
-			}
-		} catch (err) {
-			console.error('Error loading saved quotes:', err)
+	// Watch currentQuoteIndex and fetch more quotes when needed
+	useEffect(() => {
+		if (movieQuotes.length > 0) {
+			fetchMovieQuotes()
 		}
-	}, [])
+		if (animeQuotes.length > 0) {
+			fetchAnimeQuotes()
+		}
+	}, [currentQuoteIndex])
+
+	const saveQuote = (quote: Quote) => {
+		setSavedQuotes((prev) => [...prev, quote])
+	}
+
+	const removeQuote = (id: string) => {
+		setSavedQuotes((prev) => prev.filter((quote) => quote.id !== id))
+	}
 
 	return (
 		<QuotesContext.Provider
@@ -209,13 +201,13 @@ export function QuotesProvider({ children }: { children: React.ReactNode }) {
 				animeQuotes,
 				savedQuotes,
 				isLoading,
-				error,
-				currentPage,
+				isLoadingMore,
 				fetchMovieQuotes,
 				fetchAnimeQuotes,
 				saveQuote,
 				removeQuote,
-				loadSavedQuotes,
+				currentQuoteIndex,
+				setCurrentQuoteIndex,
 			}}
 		>
 			{children}
@@ -223,9 +215,9 @@ export function QuotesProvider({ children }: { children: React.ReactNode }) {
 	)
 }
 
-export const useQuotes = () => {
+export function useQuotes() {
 	const context = useContext(QuotesContext)
-	if (context === undefined) {
+	if (!context) {
 		throw new Error('useQuotes must be used within a QuotesProvider')
 	}
 	return context

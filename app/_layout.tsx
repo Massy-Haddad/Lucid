@@ -13,11 +13,13 @@ import { Feather } from '@expo/vector-icons'
 import Toast from 'react-native-toast-message'
 import * as SplashScreen from 'expo-splash-screen'
 import * as NavigationBar from 'expo-navigation-bar'
-import { Image, TouchableOpacity, View } from 'react-native'
+import { Image, TouchableOpacity, View, useColorScheme } from 'react-native'
+import { BlurView } from 'expo-blur'
+import { useThemeColor } from '@/hooks/useThemeColor'
 
 import Splash from '@/components/Splash'
 import { ThemedText } from '@/components/ThemedText'
-import { useColorScheme } from '@/hooks/useColorScheme'
+import { useColorScheme as useAppColorScheme } from '@/hooks/useColorScheme'
 import { QuotesProvider } from '@/context/QuotesContext'
 import { toastConfig } from '@/components/ui/CustomToast'
 import { SessionProvider, useSession } from '@/context/AuthProvider'
@@ -34,8 +36,18 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
 
+// Add this type near the top of the file
+type HeaderStyle = {
+	backgroundColor?: string
+	borderBottomWidth?: number
+	borderBottomColor?: string
+	height?: number
+}
+
 function HeaderRight() {
 	const { signOut } = useSession()
+	const textColor = useThemeColor({}, 'text')
+	const backgroundColor = useThemeColor({}, 'background')
 
 	const handleSignOut = async () => {
 		try {
@@ -46,9 +58,41 @@ function HeaderRight() {
 	}
 
 	return (
-		<TouchableOpacity onPress={handleSignOut}>
-			<Feather name="log-out" size={30} color="white" />
+		<TouchableOpacity
+			onPress={handleSignOut}
+			className="w-10 h-10 rounded-full items-center justify-center"
+			style={{
+				backgroundColor: backgroundColor,
+			}}
+		>
+			<Feather name="log-out" size={20} color={textColor} />
 		</TouchableOpacity>
+	)
+}
+
+function HeaderLeft() {
+	const textColor = useThemeColor({}, 'text')
+	const backgroundColor = useThemeColor({}, 'background')
+
+	return (
+		<TouchableOpacity
+			className="w-10 h-10 rounded-full items-center justify-center"
+			style={{
+				backgroundColor: backgroundColor,
+			}}
+		>
+			<Feather name="user" size={20} color={textColor} />
+		</TouchableOpacity>
+	)
+}
+
+function HeaderTitle() {
+	return (
+		<View className="flex-1 items-center justify-center">
+			<ThemedText type="subtitle" className="text-center text-lg font-semibold">
+				Home
+			</ThemedText>
+		</View>
 	)
 }
 
@@ -77,7 +121,9 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-	const colorScheme = useColorScheme()
+	const colorScheme = useAppColorScheme()
+	const backgroundColor = useThemeColor({}, 'background')
+	const borderColor = useThemeColor({}, 'border')
 
 	useEffect(() => {
 		const fetchColor = async () => {
@@ -98,32 +144,41 @@ function RootLayoutNav() {
 		<ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
 			<SessionProvider>
 				<QuotesProvider>
-					<Stack screenOptions={{ headerShadowVisible: false }}>
+					<Stack
+						screenOptions={{
+							headerShadowVisible: false,
+							headerStyle: {
+								backgroundColor: backgroundColor,
+								borderBottomWidth: 1,
+								borderBottomColor: borderColor,
+							} as HeaderStyle,
+						}}
+					>
 						<Stack.Screen name="index" options={{ headerShown: false }} />
 						<Stack.Screen name="(auth)" options={{ headerShown: false }} />
 						<Stack.Screen
 							name="(home)"
 							options={{
-								headerLeft: () => (
-									<TouchableOpacity>
-										<Feather name="user" size={30} color="white" />
-									</TouchableOpacity>
-								),
+								headerLeft: () => <HeaderLeft />,
 								headerRight: () => <HeaderRight />,
-								headerTitle: () => (
-									<View className="flex-1 items-center justify-center">
-										<ThemedText type="subtitle" className="text-center">
-											Home
-										</ThemedText>
-									</View>
-								),
+								headerTitle: () => <HeaderTitle />,
+								headerStyle: {
+									backgroundColor: backgroundColor,
+									borderBottomWidth: 1,
+									borderBottomColor: borderColor,
+									height: 60,
+								} as HeaderStyle,
+								headerTitleStyle: {
+									fontSize: 18,
+									fontWeight: '600',
+								},
 							}}
 						/>
 						<Stack.Screen name="quote/[id]" options={{ headerShown: false }} />
 					</Stack>
 				</QuotesProvider>
 			</SessionProvider>
-			<StatusBar style="auto" />
+			<StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
 			<Toast config={toastConfig} />
 		</ThemeProvider>
 	)

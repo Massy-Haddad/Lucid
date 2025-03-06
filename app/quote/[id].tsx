@@ -1,148 +1,110 @@
 import React from 'react'
-import { View, TouchableOpacity, ImageBackground } from 'react-native'
+import {
+	View,
+	TouchableOpacity,
+	ImageBackground,
+	ScrollView,
+	Dimensions,
+} from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { BlurView } from 'expo-blur'
-import { IconSymbol } from '@/components/ui/IconSymbol'
-import { Colors } from '@/constants/Colors'
-import { useColorScheme } from '@/hooks/useColorScheme'
 import { useQuotes } from '@/context/QuotesContext'
 import { Quote } from '@/types/quote'
 import { ThemedText } from '@/components/ThemedText'
+import { Feather, FontAwesome } from '@expo/vector-icons'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { ThemedView } from '@/components/ThemedView'
+import { LinearGradient } from 'expo-linear-gradient'
+
+const { height, width } = Dimensions.get('window')
 
 export default function QuoteDetailScreen() {
-	const { id } = useLocalSearchParams()
 	const router = useRouter()
-	const colorScheme = useColorScheme()
-	const { movieQuotes, animeQuotes, savedQuotes, saveQuote, removeQuote } =
-		useQuotes()
-
-	const quote = [...movieQuotes, ...animeQuotes, ...savedQuotes].find(
-		(q: Quote) => q.id === id
-	)
-
-	if (!quote) {
-		return (
-			<View className="flex-1">
-				<ImageBackground
-					source={require('@/assets/images/bg1.jpg')}
-					className="flex-1 w-full h-full"
-					blurRadius={3}
-				>
-					<View className="flex-1 bg-black/30">
-						<BlurView
-							intensity={30}
-							tint={colorScheme === 'dark' ? 'dark' : 'light'}
-							className="flex-1 items-center justify-center p-6"
-						>
-							<ThemedText type="title" className="text-center text-2xl mb-6">
-								Quote not found
-							</ThemedText>
-							<TouchableOpacity
-								className="bg-white/10 backdrop-blur-lg px-6 py-3 rounded-2xl"
-								onPress={() => router.back()}
-							>
-								<ThemedText type="default">Go Back</ThemedText>
-							</TouchableOpacity>
-						</BlurView>
-					</View>
-				</ImageBackground>
-			</View>
-		)
-	}
+	const insets = useSafeAreaInsets()
+	const { quote: quoteParam } = useLocalSearchParams()
+	const quote = JSON.parse(quoteParam as string)
+	const { savedQuotes, saveQuote, removeQuote } = useQuotes()
 
 	const isQuoteSaved = savedQuotes.some((q: Quote) => q.id === quote.id)
 
 	return (
-		<View className="flex-1">
+		<ThemedView className="flex-1">
 			<ImageBackground
-				source={require('@/assets/images/bg1.jpg')}
-				className="flex-1 w-full h-full"
-				blurRadius={3}
+				source={quote.backgroundImage}
+				className="flex-1"
+				style={{ width: width, height: height * 0.3 }}
 			>
-				<View className="flex-1 bg-black/30">
-					<BlurView
-						intensity={30}
-						tint={colorScheme === 'dark' ? 'dark' : 'light'}
-						className="flex-1"
+				<LinearGradient
+					colors={['transparent', 'rgba(0,0,0,0.85)']}
+					locations={[0, 0.5]}
+					style={{
+						position: 'absolute',
+						left: 0,
+						right: 0,
+						bottom: 0,
+						height: '100%',
+					}}
+				/>
+				{/* Header Buttons */}
+				<View className="absolute left-5 z-10" style={{ top: insets.top + 5 }}>
+					<TouchableOpacity
+						onPress={() => router.back()}
+						className="w-10 h-10 rounded-full bg-black/20 items-center justify-center"
 					>
-						<View className="flex-1 p-6">
-							{/* Back Button */}
-							<TouchableOpacity
-								className="absolute top-16 left-6 z-10 bg-white/10 backdrop-blur-lg w-12 h-12 rounded-full items-center justify-center"
-								onPress={() => router.back()}
-							>
-								<IconSymbol
-									name="chevron.left"
-									size={24}
-									color={Colors[colorScheme ?? 'light'].tint}
-								/>
-							</TouchableOpacity>
+						<Feather name="chevron-left" size={28} color="#FFF" />
+					</TouchableOpacity>
+				</View>
 
-							{/* Save Button */}
-							<TouchableOpacity
-								className="absolute top-16 right-6 z-10 bg-white/10 backdrop-blur-lg w-12 h-12 rounded-full items-center justify-center"
-								onPress={() =>
-									isQuoteSaved ? removeQuote(quote.id) : saveQuote(quote)
-								}
-							>
-								<IconSymbol
-									name={isQuoteSaved ? 'heart.fill' : 'heart'}
-									size={24}
-									color={Colors[colorScheme ?? 'light'].tint}
-								/>
-							</TouchableOpacity>
-
-							{/* Quote Content */}
-							<View className="flex-1 justify-center items-center">
-								<View className="bg-white/5 backdrop-blur-lg rounded-3xl p-8 w-full max-w-lg">
-									<ThemedText
-										type="title"
-										className="text-center text-3xl font-bold mb-8"
-									>
-										"{quote.text}"
-									</ThemedText>
-
-									<View className="mt-6">
-										<ThemedText
-											type="subtitle"
-											className="text-center text-xl font-semibold"
-										>
-											{quote.source}
-										</ThemedText>
-										<ThemedText
-											type="default"
-											className="text-center text-lg mt-2 italic"
-										>
-											- {quote.author}
-										</ThemedText>
-									</View>
-								</View>
-							</View>
-
-							{/* Save Button Label */}
-							<View className="items-center mb-6">
-								<TouchableOpacity
-									className="flex-row items-center bg-white/10 backdrop-blur-lg px-6 py-3 rounded-2xl"
-									onPress={() =>
-										isQuoteSaved ? removeQuote(quote.id) : saveQuote(quote)
-									}
-								>
-									<IconSymbol
-										name={isQuoteSaved ? 'heart.fill' : 'heart'}
-										size={20}
-										color={Colors[colorScheme ?? 'light'].tint}
-									/>
-									<ThemedText type="default" className="ml-2">
-										{isQuoteSaved
-											? 'Remove from Favorites'
-											: 'Add to Favorites'}
-									</ThemedText>
-								</TouchableOpacity>
-							</View>
-						</View>
-					</BlurView>
+				<View className="absolute right-5 z-10" style={{ top: insets.top + 5 }}>
+					<TouchableOpacity
+						className="w-10 h-10 rounded-full bg-black/20 items-center justify-center"
+						onPress={() =>
+							isQuoteSaved ? removeQuote(quote.id) : saveQuote(quote)
+						}
+					>
+						<Feather
+							name={isQuoteSaved ? 'heart' : 'heart'}
+							size={24}
+							color="#FFF"
+						/>
+					</TouchableOpacity>
 				</View>
 			</ImageBackground>
-		</View>
+
+			{/* Content Card */}
+			<ThemedView
+				className="absolute bottom-0 left-0 right-0 rounded-t-[30px] overflow-hidden"
+				style={{ minHeight: height * 0.8 }}
+			>
+				<ScrollView className="flex-1">
+					{/* Author Info */}
+					<View className="px-5 mt-8 mb-5">
+						<ThemedText type="title" className="mb-3">
+							{quote.text}
+						</ThemedText>
+						<View className="flex-row items-center gap-2">
+							<Feather name="bookmark" size={16} color="#666" />
+							<ThemedText type="muted">{quote.source}</ThemedText>
+						</View>
+					</View>
+
+					{/* Quote Text */}
+					<View className="mx-5 mb-8 p-5 bg-gray-100 rounded-2xl">
+						<FontAwesome name="quote-left" size={24} color="#666" />
+						<ThemedText type="primary" className="italic">
+							" {quote.text} "
+						</ThemedText>
+					</View>
+
+					{/* Similar Quotes Section */}
+					<View className="px-5 mb-8">
+						<View className="flex-row justify-between items-center mb-4">
+							<ThemedText type="subtitle">Similar quotes</ThemedText>
+							<ThemedText type="primary">See all</ThemedText>
+						</View>
+						{/* Add similar quotes carousel here */}
+					</View>
+				</ScrollView>
+			</ThemedView>
+		</ThemedView>
 	)
 }

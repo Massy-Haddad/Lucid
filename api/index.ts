@@ -1,3 +1,5 @@
-import quotable from './providers/quotable'
+import ninjas from './providers/ninjas'
 
-export default { quotable }
+export default {
+	ninjas,
+}

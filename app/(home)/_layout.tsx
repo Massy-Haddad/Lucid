@@ -3,7 +3,7 @@ import { useSession } from '@/context/AuthProvider'
 import { BlurView } from 'expo-blur'
 import { View } from 'react-native'
 import { useColorScheme } from '@/hooks/useColorScheme'
-import { Colors } from '@/constants/Colors'
+import { useThemeColor } from '@/hooks/useThemeColor'
 
 import {
 	createMaterialTopTabNavigator,
@@ -24,13 +24,19 @@ export default function HomeLayout() {
 	const { session, isLoading } = useSession()
 	const colorScheme = useColorScheme()
 
+	// Get theme colors
+	const tintColor = useThemeColor({}, 'tint')
+	const tabIconDefault = useThemeColor({}, 'tabIconDefault')
+	const background = useThemeColor({}, 'background')
+	const border = useThemeColor({}, 'border')
+
 	// If user is not authenticated, redirect to auth
 	if (!isLoading && !session) {
 		return <Redirect href="/auth" />
 	}
 
 	return (
-		<View className="flex-1">
+		<View className="flex-1" style={{ backgroundColor: background }}>
 			<BlurView
 				intensity={30}
 				tint={colorScheme === 'dark' ? 'dark' : 'light'}
@@ -42,13 +48,15 @@ export default function HomeLayout() {
 							backgroundColor: 'transparent',
 							elevation: 0,
 							shadowOpacity: 0,
+							borderBottomWidth: 1,
+							borderBottomColor: border,
 						},
 						tabBarIndicatorStyle: {
-							backgroundColor: Colors[colorScheme ?? 'light'].tint,
+							backgroundColor: tintColor,
+							height: 3,
 						},
-						tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-						tabBarInactiveTintColor:
-							Colors[colorScheme ?? 'light'].tabIconDefault,
+						tabBarActiveTintColor: tintColor,
+						tabBarInactiveTintColor: tabIconDefault,
 						tabBarLabelStyle: {
 							fontWeight: '600',
 							textTransform: 'none',
