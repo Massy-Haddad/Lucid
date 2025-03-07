@@ -13,6 +13,11 @@ export type ThemedTextProps = TextProps & {
 		| 'link'
 		| 'muted'
 		| 'primary'
+		| 'destructive'
+		| 'secondary'
+		| 'accent'
+		| 'ring'
+		| 'mutedForeground'
 	fontFamily?: 'Satoshi' | 'SpaceMono' | 'ClashGrotesk' | 'Lexend' | 'Against'
 }
 
@@ -30,6 +35,14 @@ export function ThemedText({
 			? 'mutedForeground'
 			: type === 'primary'
 			? 'primary'
+			: type === 'destructive'
+			? 'destructive'
+			: type === 'secondary'
+			? 'secondary'
+			: type === 'accent'
+			? 'accent'
+			: type === 'ring'
+			? 'ring'
 			: 'text'
 	)
 
@@ -44,6 +57,11 @@ export function ThemedText({
 				type === 'link' ? styles.link : undefined,
 				type === 'muted' ? styles.muted : undefined,
 				type === 'primary' ? styles.primary : undefined,
+				type === 'destructive' ? styles.destructive : undefined,
+				type === 'secondary' ? styles.secondary : undefined,
+				type === 'accent' ? styles.accent : undefined,
+				type === 'ring' ? styles.ring : undefined,
+				type === 'mutedForeground' ? styles.mutedForeground : undefined,
 				style,
 				{ fontFamily: fontFamily },
 			]}
@@ -80,6 +98,31 @@ const styles = StyleSheet.create({
 		lineHeight: 24,
 	},
 	primary: {
+		fontSize: 14,
+		lineHeight: 24,
+		fontWeight: '600',
+	},
+	destructive: {
+		fontSize: 14,
+		lineHeight: 24,
+		fontWeight: '600',
+	},
+	secondary: {
+		fontSize: 14,
+		lineHeight: 24,
+		fontWeight: '600',
+	},
+	accent: {
+		fontSize: 14,
+		lineHeight: 24,
+		fontWeight: '600',
+	},
+	ring: {
+		fontSize: 14,
+		lineHeight: 24,
+		fontWeight: '600',
+	},
+	mutedForeground: {
 		fontSize: 14,
 		lineHeight: 24,
 		fontWeight: '600',

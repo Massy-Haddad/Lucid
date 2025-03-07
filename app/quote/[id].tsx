@@ -78,8 +78,8 @@ export default function QuoteDetailScreen() {
 				<ScrollView className="flex-1">
 					{/* Author Info */}
 					<View className="px-5 mt-8 mb-5">
-						<ThemedText type="title" className="mb-3">
-							{quote.text}
+						<ThemedText type="subtitle" className="mb-3">
+							{quote.author}
 						</ThemedText>
 						<View className="flex-row items-center gap-2">
 							<Feather name="bookmark" size={16} color="#666" />
@@ -90,9 +90,7 @@ export default function QuoteDetailScreen() {
 					{/* Quote Text */}
 					<View className="mx-5 mb-8 p-5 bg-gray-100 rounded-2xl">
 						<FontAwesome name="quote-left" size={24} color="#666" />
-						<ThemedText type="primary" className="italic">
-							" {quote.text} "
-						</ThemedText>
+						<ThemedText type="primary">" {quote.text} "</ThemedText>
 					</View>
 
 					{/* Similar Quotes Section */}

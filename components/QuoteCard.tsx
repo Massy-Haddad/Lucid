@@ -34,8 +34,7 @@ export function QuoteCard({ quote, onSave, isActive = true }: QuoteCardProps) {
 	const background = useThemeColor({}, 'background')
 	const borderColor = useThemeColor({}, 'border')
 	const primaryColor = useThemeColor({}, 'primary')
-	const mutedColor = useThemeColor({}, 'muted')
-
+	const mutedForegroundColor = useThemeColor({}, 'mutedForeground')
 	const backgroundImage = useMemo(() => {
 		const getRandomImage = (images: Record<string, any>) => {
 			const keys = Object.keys(images)
@@ -64,7 +63,7 @@ export function QuoteCard({ quote, onSave, isActive = true }: QuoteCardProps) {
 		>
 			<ImageBackground
 				source={backgroundImage}
-				className="flex-1 w-full h-full"
+				className="flex-1 w-full h-full rounded-3xl"
 				imageStyle={{ borderRadius: 24 }}
 			>
 				{/* Gradient Overlay */}
@@ -102,7 +101,7 @@ export function QuoteCard({ quote, onSave, isActive = true }: QuoteCardProps) {
 						{/* Content */}
 						<View className="gap-3">
 							<View>
-								<ThemedText type="subtitle" className="leading-6 mb-1">
+								<ThemedText type="subtitle" className="leading-5 mb-1">
 									{quote.text}
 								</ThemedText>
 
@@ -112,8 +111,10 @@ export function QuoteCard({ quote, onSave, isActive = true }: QuoteCardProps) {
 										size={16}
 										color={textColor}
 									/>
-									<ThemedText type="default">{quote.author}</ThemedText>
-									<ThemedText type="default">• {quote.source}</ThemedText>
+									<ThemedText type="mutedForeground">{quote.author}</ThemedText>
+									<ThemedText type="mutedForeground">
+										• {quote.source}
+									</ThemedText>
 								</View>
 							</View>
 
@@ -131,7 +132,7 @@ export function QuoteCard({ quote, onSave, isActive = true }: QuoteCardProps) {
 								<TouchableOpacity>
 									<BlurView
 										intensity={50}
-										className="flex-row items-center justify-between mx-4 my-2 p-2 rounded-full overflow-hidden"
+										className="flex-row items-center justify-between mx-2 my-2 p-2 rounded-full overflow-hidden"
 										style={{
 											backgroundColor: `hsla(${
 												colorScheme === 'dark'

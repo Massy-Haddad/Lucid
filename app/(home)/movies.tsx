@@ -77,11 +77,12 @@ export default function MovieQuotesScreen() {
 					backgroundColor="transparent"
 					stackSize={3}
 					cardVerticalMargin={50}
-					cardHorizontalMargin={15}
+					cardHorizontalMargin={20}
 					animateOverlayLabelsOpacity
 					animateCardOpacity
-					verticalSwipe={false}
 					infinite
+					showSecondCard={true}
+					verticalSwipe={false}
 					overlayLabels={{
 						left: {
 							title: 'NOPE',
