@@ -2,7 +2,6 @@ import { Image, StyleSheet } from 'react-native'
 import ParallaxScrollView from '@/components/ParallaxScrollView'
 import { ThemedText } from '@/components/ThemedText'
 import { ThemedView } from '@/components/ThemedView'
-import { Feather } from '@expo/vector-icons'
 import { useSession } from '@/context/AuthProvider'
 
 export default function AccountScreen() {
@@ -19,11 +18,12 @@ export default function AccountScreen() {
 			}
 		>
 			<ThemedView style={styles.titleContainer}>
-				<Feather name="archive" size={28} color="white" />
-				<ThemedText type="title">User information</ThemedText>
+				<ThemedText type="title">Account</ThemedText>
 			</ThemedView>
 			<ThemedView style={styles.stepContainer}>
-				<ThemedText type="subtitle">{session?.email}</ThemedText>
+				<ThemedText type="subtitle">
+					Welcome, {session?.email?.split('@')[0]}
+				</ThemedText>
 			</ThemedView>
 		</ParallaxScrollView>
 	)

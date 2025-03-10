@@ -14,9 +14,9 @@ export default function MovieQuotesScreen() {
 	const {
 		movieQuotes,
 		fetchMovieQuotes,
-		saveQuote,
 		isLoading,
 		setCurrentQuoteIndex,
+		isQuoteSaved,
 	} = useQuotes()
 	const colorScheme = useColorScheme()
 	const swiperRef = useRef<Swiper<Quote>>(null)
@@ -60,8 +60,9 @@ export default function MovieQuotesScreen() {
 						return (
 							<QuoteCard
 								quote={quote}
-								onSave={() => saveQuote(quote)}
 								isActive={cardIndex === 0}
+								isSaved={isQuoteSaved(quote.id)}
+								variant="swiper"
 							/>
 						)
 					}}
@@ -70,70 +71,23 @@ export default function MovieQuotesScreen() {
 					}}
 					cardIndex={0}
 					backgroundColor="transparent"
+					infinite
 					stackSize={3}
+					stackScale={0.95}
+					stackSeparation={22}
 					cardVerticalMargin={24}
 					cardHorizontalMargin={20}
 					animateOverlayLabelsOpacity
 					animateCardOpacity
-					infinite
-					showSecondCard={true}
-					verticalSwipe={false}
-					overlayLabels={{
-						left: {
-							title: 'NOPE',
-							style: {
-								label: {
-									opacity: 0.7,
-									backgroundColor: 'transparent',
-									color: '#FF3B30',
-									fontSize: 32,
-									fontWeight: 'bold',
-									borderWidth: 3,
-									borderColor: '#FF3B30',
-									borderRadius: 20,
-									paddingHorizontal: 20,
-									paddingVertical: 10,
-									transform: [{ rotate: '30deg' }],
-								},
-								wrapper: {
-									flexDirection: 'column',
-									alignItems: 'flex-end',
-									justifyContent: 'flex-start',
-									marginTop: 30,
-									marginLeft: -30,
-								},
-							},
-						},
-						right: {
-							title: 'SAVE',
-							style: {
-								label: {
-									opacity: 0.7,
-									backgroundColor: 'transparent',
-									color: Colors[colorScheme ?? 'light'].tint,
-									fontSize: 32,
-									fontWeight: 'bold',
-									borderWidth: 3,
-									borderColor: Colors[colorScheme ?? 'light'].tint,
-									borderRadius: 20,
-									paddingHorizontal: 20,
-									paddingVertical: 10,
-									transform: [{ rotate: '-30deg' }],
-								},
-								wrapper: {
-									flexDirection: 'column',
-									alignItems: 'flex-start',
-									justifyContent: 'flex-start',
-									marginTop: 30,
-									marginLeft: 30,
-								},
-							},
-						},
-					}}
+					horizontalSwipe={false}
+					verticalSwipe={true}
+					showSecondCard
+					disableBottomSwipe={false}
+					goBackToPreviousCardOnSwipeBottom
 				/>
 				<View className="absolute bottom-0 left-0 right-0 p-16 mb-28">
 					<ThemedText type="muted" className="text-center">
-						Swipe left to reject, swipe right to save.
+						Swipe up for next, swipe down for previous.
 					</ThemedText>
 				</View>
 			</View>

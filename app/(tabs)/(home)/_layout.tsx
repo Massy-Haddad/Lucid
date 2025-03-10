@@ -74,7 +74,7 @@ export default function HomeLayout() {
 							fontWeight: '600',
 							textTransform: 'none',
 						},
-						swipeEnabled: false,
+						swipeEnabled: true,
 					}}
 				>
 					<Tab.Screen

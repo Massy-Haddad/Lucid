@@ -48,7 +48,7 @@ export default function TabLayout() {
 				),
 				tabBarStyle: {
 					position: 'absolute',
-					bottom: 40,
+					bottom: 32,
 					height: 88,
 					alignSelf: 'center',
 					justifyContent: 'center',

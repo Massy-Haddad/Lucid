@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import api from '@/api'
 import { Quote } from '@/types/quote'
 
@@ -10,11 +11,15 @@ interface QuotesContextType {
 	isLoadingMore: boolean
 	fetchMovieQuotes: (force?: boolean) => Promise<void>
 	fetchAnimeQuotes: (force?: boolean) => Promise<void>
-	saveQuote: (quote: Quote) => void
-	removeQuote: (id: string) => void
+	saveQuote: (quote: Quote) => Promise<void>
+	removeQuote: (id: string) => Promise<void>
+	isQuoteSaved: (id: string) => boolean
 	currentQuoteIndex: number
 	setCurrentQuoteIndex: (index: number) => void
+	loadSavedQuotes: () => Promise<void>
 }
+
+const STORAGE_KEY = '@quotes_storage'
 
 const QuotesContext = createContext<QuotesContextType>({} as QuotesContextType)
 
@@ -25,6 +30,57 @@ export function QuotesProvider({ children }: { children: React.ReactNode }) {
 	const [isLoading, setIsLoading] = useState(false)
 	const [isLoadingMore, setIsLoadingMore] = useState(false)
 	const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0)
+
+	// Load saved quotes from storage on mount
+	useEffect(() => {
+		loadSavedQuotes()
+	}, [])
+
+	const loadSavedQuotes = async () => {
+		try {
+			const savedQuotesString = await AsyncStorage.getItem(STORAGE_KEY)
+			if (savedQuotesString) {
+				setSavedQuotes(JSON.parse(savedQuotesString))
+			}
+		} catch (error) {
+			console.error('Error loading saved quotes:', error)
+		}
+	}
+
+	const persistSavedQuotes = async (quotes: Quote[]) => {
+		try {
+			await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(quotes))
+		} catch (error) {
+			console.error('Error persisting saved quotes:', error)
+		}
+	}
+
+	const saveQuote = async (quote: Quote) => {
+		try {
+			const newSavedQuotes = [
+				...savedQuotes,
+				{ ...quote, savedAt: new Date().toISOString() },
+			]
+			setSavedQuotes(newSavedQuotes)
+			await persistSavedQuotes(newSavedQuotes)
+		} catch (error) {
+			console.error('Error saving quote:', error)
+		}
+	}
+
+	const removeQuote = async (id: string) => {
+		try {
+			const newSavedQuotes = savedQuotes.filter((quote) => quote.id !== id)
+			setSavedQuotes(newSavedQuotes)
+			await persistSavedQuotes(newSavedQuotes)
+		} catch (error) {
+			console.error('Error removing quote:', error)
+		}
+	}
+
+	const isQuoteSaved = (id: string) => {
+		return savedQuotes.some((quote) => quote.id === id)
+	}
 
 	const fetchMovieQuotes = async (force: boolean = false) => {
 		try {
@@ -186,14 +242,6 @@ export function QuotesProvider({ children }: { children: React.ReactNode }) {
 		}
 	}, [currentQuoteIndex])
 
-	const saveQuote = (quote: Quote) => {
-		setSavedQuotes((prev) => [...prev, quote])
-	}
-
-	const removeQuote = (id: string) => {
-		setSavedQuotes((prev) => prev.filter((quote) => quote.id !== id))
-	}
-
 	return (
 		<QuotesContext.Provider
 			value={{
@@ -206,8 +254,10 @@ export function QuotesProvider({ children }: { children: React.ReactNode }) {
 				fetchAnimeQuotes,
 				saveQuote,
 				removeQuote,
+				isQuoteSaved,
 				currentQuoteIndex,
 				setCurrentQuoteIndex,
+				loadSavedQuotes,
 			}}
 		>
 			{children}

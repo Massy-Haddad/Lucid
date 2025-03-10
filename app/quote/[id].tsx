@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
 	View,
 	TouchableOpacity,
@@ -14,17 +14,65 @@ import { Feather, FontAwesome } from '@expo/vector-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ThemedView } from '@/components/ThemedView'
 import { LinearGradient } from 'expo-linear-gradient'
+import { Images } from '@/constants/Images'
 
 const { height, width } = Dimensions.get('window')
+
+interface QuoteWithBackground extends Quote {
+	backgroundImage?: any
+}
 
 export default function QuoteDetailScreen() {
 	const router = useRouter()
 	const insets = useSafeAreaInsets()
 	const { quote: quoteParam } = useLocalSearchParams()
-	const quote = JSON.parse(quoteParam as string)
-	const { savedQuotes, saveQuote, removeQuote } = useQuotes()
+	const quote = JSON.parse(quoteParam as string) as QuoteWithBackground
+	const { isQuoteSaved, saveQuote, removeQuote, savedQuotes } = useQuotes()
+	const [isSaved, setIsSaved] = useState(false)
 
-	const isQuoteSaved = savedQuotes.some((q: Quote) => q.id === quote.id)
+	// Update local state whenever savedQuotes changes
+	useEffect(() => {
+		const saved = isQuoteSaved(quote.id)
+		console.log(`[QuoteDetail] Quote ${quote.id} saved status:`, saved)
+		setIsSaved(saved)
+	}, [quote.id, savedQuotes]) // Watch savedQuotes instead of isQuoteSaved
+
+	const handleToggleSave = async () => {
+		try {
+			console.log(
+				`[QuoteDetail] Attempting to toggle save for quote ${quote.id}. Current state:`,
+				isSaved
+			)
+
+			if (isSaved) {
+				console.log(`[QuoteDetail] Removing quote ${quote.id}`)
+				await removeQuote(quote.id)
+			} else {
+				console.log(`[QuoteDetail] Saving quote ${quote.id}`)
+				await saveQuote(quote)
+			}
+
+			const newSavedState = !isSaved
+			console.log(
+				`[QuoteDetail] Save toggle complete. New state:`,
+				newSavedState
+			)
+			setIsSaved(newSavedState)
+		} catch (error) {
+			console.error('[QuoteDetail] Error toggling quote save:', error)
+		}
+	}
+
+	// If no background image was passed, get a default one
+	if (!quote.backgroundImage) {
+		const getRandomImage = (images: Record<string, any>) => {
+			const keys = Object.keys(images)
+			const randomKey = keys[Math.floor(Math.random() * keys.length)]
+			return images[randomKey]
+		}
+
+		quote.backgroundImage = getRandomImage(Images.quotes.history)
+	}
 
 	return (
 		<ThemedView className="flex-1">
@@ -57,14 +105,12 @@ export default function QuoteDetailScreen() {
 				<View className="absolute right-5 z-10" style={{ top: insets.top + 5 }}>
 					<TouchableOpacity
 						className="w-10 h-10 rounded-full bg-black/20 items-center justify-center"
-						onPress={() =>
-							isQuoteSaved ? removeQuote(quote.id) : saveQuote(quote)
-						}
+						onPress={handleToggleSave}
 					>
-						<Feather
-							name={isQuoteSaved ? 'heart' : 'heart'}
+						<FontAwesome
+							name={isSaved ? 'heart' : 'heart-o'}
 							size={24}
-							color="#FFF"
+							color={isSaved ? '#FF3B30' : '#FFF'}
 						/>
 					</TouchableOpacity>
 				</View>

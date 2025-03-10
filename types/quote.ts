@@ -1,7 +1,9 @@
-export type Quote = {
+export interface Quote {
 	id: string
 	text: string
-	source: string
 	author: string
+	source: string
 	type: 'movie' | 'anime'
+	backgroundImage?: any // ImageSourcePropType from react-native
+	savedAt?: string
 }

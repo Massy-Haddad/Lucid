@@ -19,25 +19,9 @@ export default function DiscoverScreen() {
 			}
 		>
 			<ThemedView style={styles.titleContainer}>
-				<Feather name="archive" size={28} color="white" />
 				<ThemedText type="title">Discover</ThemedText>
 			</ThemedView>
-			<ThemedView style={styles.stepContainer}>
-				<ThemedText type="subtitle">Quotes</ThemedText>
-				{savedQuotes.length > 0 ? (
-					<ThemedText>
-						{savedQuotes.map((quote, index) => (
-							<ThemedText key={quote.id}>
-								{index + 1}. {quote.text}
-								{'\n'}
-								{'\n'}
-							</ThemedText>
-						))}
-					</ThemedText>
-				) : (
-					<ThemedText>No saved quotes</ThemedText>
-				)}
-			</ThemedView>
+			<ThemedText>All quotes</ThemedText>
 		</ParallaxScrollView>
 	)
 }

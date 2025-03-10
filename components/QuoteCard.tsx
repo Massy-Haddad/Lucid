@@ -1,9 +1,10 @@
-import React, { useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
 	View,
 	TouchableOpacity,
 	ImageBackground,
 	Dimensions,
+	ViewStyle,
 } from 'react-native'
 import {
 	Feather,
@@ -14,105 +15,169 @@ import { Link } from 'expo-router'
 import { BlurView } from 'expo-blur'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useColorScheme } from '@/hooks/useColorScheme'
+import { useRouter } from 'expo-router'
+import { getQuoteImage } from '@/utils/imageMapping'
 
 import { Quote } from '@/types/quote'
-import { Images } from '@/constants/Images'
 import { ThemedText } from '@/components/ThemedText'
 import { useThemeColor } from '@/hooks/useThemeColor'
+import { Colors } from '@/constants/Colors'
+import { useQuotes } from '@/context/QuotesContext'
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window')
 
-interface QuoteCardProps {
+export interface QuoteCardProps {
 	quote: Quote
-	onSave: () => void
-	isActive?: boolean
+	onSave?: () => void
+	isActive: boolean
+	isSaved?: boolean
+	style?: ViewStyle
+	variant?: 'grid' | 'swiper'
 }
 
-export function QuoteCard({ quote, onSave, isActive = true }: QuoteCardProps) {
+export function QuoteCard({
+	quote,
+	onSave,
+	isActive,
+	style,
+	variant = 'swiper',
+}: QuoteCardProps) {
 	const colorScheme = useColorScheme()
 	const textColor = useThemeColor({}, 'text')
 	const background = useThemeColor({}, 'background')
 	const borderColor = useThemeColor({}, 'border')
 	const primaryColor = useThemeColor({}, 'primary')
 	const mutedForegroundColor = useThemeColor({}, 'mutedForeground')
-	const backgroundImage = useMemo(() => {
-		const getRandomImage = (images: Record<string, any>) => {
-			const keys = Object.keys(images)
-			const randomKey = keys[Math.floor(Math.random() * keys.length)]
-			return images[randomKey]
-		}
+	const router = useRouter()
+	const { isQuoteSaved, saveQuote, removeQuote, savedQuotes } = useQuotes()
+	const [isSaved, setIsSaved] = useState(false)
+	const isGrid = variant === 'grid'
 
-		switch (quote.source.toLowerCase()) {
-			case 'anime':
-				return getRandomImage(Images.quotes.animes)
-			case 'movie':
-			case 'history':
-			default:
-				return getRandomImage(Images.quotes.history)
+	// Get the background image once and memoize it
+	const backgroundImage = getQuoteImage(quote.id, quote.source)
+
+	useEffect(() => {
+		const saved = isQuoteSaved(quote.id)
+		if (saved !== isSaved) {
+			console.log(
+				`[QuoteCard] Quote ${quote.author} saved status changed to:`,
+				saved
+			)
+			setIsSaved(saved)
 		}
-	}, [quote.id])
+	}, [quote.id, savedQuotes, isSaved])
+
+	const handleSave = async () => {
+		try {
+			const newSavedState = !isSaved
+			setIsSaved(newSavedState)
+
+			if (newSavedState) {
+				console.log(`[QuoteCard] Saving quote from ${quote.author}`)
+				await saveQuote({ ...quote, backgroundImage })
+			} else {
+				console.log(`[QuoteCard] Removing quote from ${quote.author}`)
+				await removeQuote(quote.id)
+			}
+		} catch (error) {
+			console.error('[QuoteCard] Error handling save:', error)
+			setIsSaved(!isSaved)
+		}
+	}
 
 	return (
 		<View
-			className="rounded-3xl overflow-hidden shadow-lg"
-			style={{
-				height: SCREEN_HEIGHT * 0.5,
-				borderColor: borderColor,
-				borderWidth: 1,
-			}}
+			className={
+				isGrid
+					? 'rounded-2xl overflow-hidden shadow-lg'
+					: 'rounded-3xl overflow-hidden shadow-lg'
+			}
+			style={[
+				{
+					height: SCREEN_HEIGHT * (isGrid ? 0.28 : 0.5),
+					borderColor: borderColor,
+					borderWidth: 1,
+				},
+				style,
+			]}
 		>
 			<ImageBackground
 				source={backgroundImage}
-				className="flex-1 w-full h-full rounded-3xl"
-				imageStyle={{ borderRadius: 24 }}
+				className="flex-1 w-full h-full"
+				imageStyle={{ borderRadius: isGrid ? 16 : 24 }}
 			>
 				{/* Gradient Overlay */}
 				<View className="flex-1">
 					<LinearGradient
 						colors={[
 							'transparent',
-							`hsla(${
-								colorScheme === 'dark' ? '255 0% 0%' : '0 0% 0%'
-							} / 0.80)`,
+							`hsla(${colorScheme === 'dark' ? '255 0% 0%' : '0 0% 0%'} / ${
+								isGrid ? '0.85' : '0.80'
+							})`,
 						]}
-						locations={[0, 0.5]}
+						locations={isGrid ? [0.2, 0.8] : [0, 0.8]}
 						style={{
 							position: 'absolute',
 							left: 0,
 							right: 0,
 							bottom: 0,
-							height: '85%',
+							height: isGrid ? '100%' : '80%',
 						}}
 					/>
-					<View className="flex-1 p-4 justify-end">
+					<View className={`flex-1 ${isGrid ? 'p-3' : 'p-4'} justify-end`}>
 						{/* Favorite Button */}
 						<TouchableOpacity
-							className="absolute top-3 right-3 z-10 w-14 h-14 rounded-full items-center justify-center"
+							className={`absolute ${
+								isGrid ? 'top-2 right-2 w-10 h-10' : 'top-3 right-3 w-14 h-14'
+							} z-10 rounded-full items-center justify-center`}
 							style={{
 								backgroundColor: `hsla(${
 									colorScheme === 'dark' ? '210 40% 98%' : '0 0% 100%'
 								} / 0.15)`,
 							}}
-							onPress={onSave}
+							onPress={handleSave}
 						>
-							<FontAwesome name="heart-o" size={22} color={textColor} />
+							<FontAwesome
+								name={isSaved ? 'heart' : 'heart-o'}
+								size={isGrid ? 18 : 22}
+								color={isSaved ? '#FF3B30' : textColor}
+							/>
 						</TouchableOpacity>
 
 						{/* Content */}
-						<View className="gap-3">
+						<View className={`gap-${isGrid ? '2' : '3'}`}>
 							<View>
-								<ThemedText type="subtitle" className="leading-6 mb-1">
+								<ThemedText
+									type="subtitle"
+									className={`leading-${isGrid ? '5' : '6'} mb-1`}
+									numberOfLines={isGrid ? 4 : undefined}
+									style={isGrid ? { fontSize: 14 } : undefined}
+								>
 									{quote.text}
 								</ThemedText>
 
-								<View className="flex-row items-center gap-2">
+								<View
+									className={`flex-row items-center gap-${isGrid ? '1' : '2'} ${
+										isGrid ? 'flex-wrap' : ''
+									}`}
+								>
 									<MaterialCommunityIcons
 										name="comment-quote"
-										size={16}
+										size={isGrid ? 14 : 16}
 										color={textColor}
 									/>
-									<ThemedText type="mutedForeground">{quote.author}</ThemedText>
-									<ThemedText type="mutedForeground">
+									<ThemedText
+										type="mutedForeground"
+										numberOfLines={isGrid ? 1 : undefined}
+										style={isGrid ? { fontSize: 12 } : undefined}
+									>
+										{quote.author}
+									</ThemedText>
+									<ThemedText
+										type="mutedForeground"
+										numberOfLines={isGrid ? 1 : undefined}
+										style={isGrid ? { fontSize: 12 } : undefined}
+									>
 										• {quote.source}
 									</ThemedText>
 								</View>
@@ -131,8 +196,11 @@ export function QuoteCard({ quote, onSave, isActive = true }: QuoteCardProps) {
 							>
 								<TouchableOpacity>
 									<BlurView
-										intensity={50}
-										className="flex-row items-center justify-between mx-4 my-2 p-1 rounded-full overflow-hidden"
+										intensity={80}
+										tint={colorScheme === 'dark' ? 'dark' : 'light'}
+										className={`flex-row items-center justify-between ${
+											isGrid ? 'mx-2 my-1' : 'mx-4 my-2'
+										} p-1 rounded-full overflow-hidden`}
 										style={{
 											backgroundColor: `hsla(${
 												colorScheme === 'dark'
@@ -143,23 +211,28 @@ export function QuoteCard({ quote, onSave, isActive = true }: QuoteCardProps) {
 									>
 										<ThemedText
 											type="default"
-											className="flex-1 text-center !text-lg ml-10"
+											className={`flex-1 text-center ${
+												isGrid ? 'ml-8' : 'ml-10'
+											}`}
+											style={isGrid ? { fontSize: 13 } : { fontSize: 16 }}
 										>
 											See more
 										</ThemedText>
 										<View
-											className="flex w-14 h-14 rounded-full items-center justify-center"
+											className={`flex ${
+												isGrid ? 'w-8 h-8' : 'w-14 h-14'
+											} rounded-full items-center justify-center`}
 											style={{
 												backgroundColor: `hsla(${
 													colorScheme === 'dark' ? '0 0% 0%' : '0 0% 0%'
-												} / 0.6)`,
+												} / 0.5)`,
 											}}
 										>
 											<Feather
 												name="chevron-right"
-												size={32}
-												color={textColor}
-												className="ml-1"
+												size={isGrid ? 20 : 32}
+												color={Colors[colorScheme ?? 'light'].mutedForeground}
+												className={isGrid ? undefined : 'ml-1'}
 											/>
 										</View>
 									</BlurView>
