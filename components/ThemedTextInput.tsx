@@ -20,6 +20,7 @@ export type ThemedTextInputProps = TextInputProps & {
 	placeholderClassName?: string
 	icon?: keyof typeof Feather.glyphMap
 	iconSize?: number
+	rounded?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full'
 }
 
 export function ThemedTextInput({
@@ -33,6 +34,7 @@ export function ThemedTextInput({
 	icon,
 	iconSize = 20,
 	secureTextEntry,
+	rounded = 'xl',
 	...rest
 }: ThemedTextInputProps) {
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false)
@@ -49,7 +51,11 @@ export function ThemedTextInput({
 	)
 
 	return (
-		<View className="mb-4 flex-row items-center bg-white/10 p-4 rounded-xl border border-white/20 w-full">
+		<View
+			className={`mb-4 flex-row items-center bg-white/10 p-4 rounded-${rounded} border border-white/20 w-full ${
+				className || ''
+			}`}
+		>
 			{icon && (
 				<Feather
 					name={icon}

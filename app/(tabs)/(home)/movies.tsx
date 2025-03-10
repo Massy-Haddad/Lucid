@@ -1,16 +1,14 @@
 import React, { useEffect, useRef } from 'react'
-import { View, ActivityIndicator, Dimensions } from 'react-native'
+import { View, ActivityIndicator } from 'react-native'
 import Swiper from 'react-native-deck-swiper'
+
+import { Quote } from '@/types/quote'
+import { Colors } from '@/constants/Colors'
 import { QuoteCard } from '@/components/QuoteCard'
 import { useQuotes } from '@/context/QuotesContext'
-import { Colors } from '@/constants/Colors'
-import { useColorScheme } from '@/hooks/useColorScheme'
-import { Quote } from '@/types/quote'
 import { ThemedText } from '@/components/ThemedText'
 import { ThemedView } from '@/components/ThemedView'
-import { BlurView } from 'expo-blur'
-
-const { height: SCREEN_HEIGHT } = Dimensions.get('window')
+import { useColorScheme } from '@/hooks/useColorScheme'
 
 export default function MovieQuotesScreen() {
 	const {
@@ -53,10 +51,7 @@ export default function MovieQuotesScreen() {
 
 	return (
 		<ThemedView className="flex-1">
-			<View
-				className="flex-1 items-center justify-center px-5 relative"
-				style={{ marginTop: SCREEN_HEIGHT * 0.05 }}
-			>
+			<View className="flex-1 items-center justify-center px-5 relative">
 				<Swiper<Quote>
 					ref={swiperRef}
 					cards={movieQuotes}
@@ -76,7 +71,7 @@ export default function MovieQuotesScreen() {
 					cardIndex={0}
 					backgroundColor="transparent"
 					stackSize={3}
-					cardVerticalMargin={50}
+					cardVerticalMargin={24}
 					cardHorizontalMargin={20}
 					animateOverlayLabelsOpacity
 					animateCardOpacity
@@ -136,7 +131,7 @@ export default function MovieQuotesScreen() {
 						},
 					}}
 				/>
-				<View className="absolute bottom-0 left-0 right-0 p-16 mb-24">
+				<View className="absolute bottom-0 left-0 right-0 p-16 mb-28">
 					<ThemedText type="muted" className="text-center">
 						Swipe left to reject, swipe right to save.
 					</ThemedText>

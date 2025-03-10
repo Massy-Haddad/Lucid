@@ -11,6 +11,8 @@ import {
 	MaterialTopTabNavigationEventMap,
 } from '@react-navigation/material-top-tabs'
 import { TabNavigationState, ParamListBase } from '@react-navigation/native'
+import { useState } from 'react'
+import { ThemedTextInput } from '@/components/ThemedTextInput'
 
 const { Navigator } = createMaterialTopTabNavigator()
 export const Tab = withLayoutContext<
@@ -35,6 +37,8 @@ export default function HomeLayout() {
 		return <Redirect href="/auth" />
 	}
 
+	const [search, setSearch] = useState('')
+
 	return (
 		<View className="flex-1" style={{ backgroundColor: background }}>
 			<BlurView
@@ -42,6 +46,15 @@ export default function HomeLayout() {
 				tint={colorScheme === 'dark' ? 'dark' : 'light'}
 				className="flex-1"
 			>
+				<View className="px-5">
+					<ThemedTextInput
+						icon="search"
+						placeholder="Search"
+						value={search}
+						onChangeText={setSearch}
+						rounded="full"
+					/>
+				</View>
 				<Tab
 					screenOptions={{
 						tabBarStyle: {

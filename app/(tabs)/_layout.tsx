@@ -1,23 +1,20 @@
 import { Tabs } from 'expo-router'
-import React, { Children } from 'react'
-import { Platform, TouchableOpacity, View, Dimensions } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import { ThemedText } from '@/components/ThemedText'
-import { Feather, FontAwesome } from '@expo/vector-icons'
+import { Feather, FontAwesome, Fontisto } from '@expo/vector-icons'
 import { useThemeColor } from '@/hooks/useThemeColor'
 import { useSession } from '@/context/AuthProvider'
-import { BlurView } from 'expo-blur'
-import { useColorScheme } from '@/hooks/useColorScheme'
 
 export default function TabLayout() {
 	const { session } = useSession()
 
-	const backgroundColor = useThemeColor({}, 'background')
+	const textColor = useThemeColor({}, 'text')
 	const cardColor = useThemeColor({}, 'card')
 	const borderColor = useThemeColor({}, 'border')
-	const cardForegroundColor = useThemeColor({}, 'cardForeground')
 	const tabIconColor = useThemeColor({}, 'tabIconDefault')
+	const backgroundColor = useThemeColor({}, 'background')
+	const cardForegroundColor = useThemeColor({}, 'cardForeground')
 	const tabIconSelectedColor = useThemeColor({}, 'tabIconSelected')
-	const textColor = useThemeColor({}, 'text')
 
 	return (
 		<Tabs
@@ -52,16 +49,17 @@ export default function TabLayout() {
 				tabBarStyle: {
 					position: 'absolute',
 					bottom: 40,
-					height: 64,
+					height: 88,
 					alignSelf: 'center',
 					justifyContent: 'center',
-					marginHorizontal: 120,
-					paddingHorizontal: 10,
-					paddingVertical: 8,
-					paddingBottom: 8,
+					marginHorizontal: 32,
+					paddingHorizontal: 0,
+					paddingBottom: 2,
+					elevation: 0,
+					shadowOpacity: 0,
 					borderWidth: 1,
 					borderTopWidth: 1,
-					borderRadius: 40,
+					borderRadius: 50,
 					borderColor: 'rgba(255, 255, 255, 0.25)',
 					backgroundColor: backgroundColor,
 				},
@@ -84,14 +82,14 @@ export default function TabLayout() {
 					tabBarIcon: ({ focused }) => (
 						<View
 							style={{
-								padding: 10,
+								padding: 16,
 								borderRadius: 30,
 								backgroundColor: focused ? tabIconSelectedColor : 'transparent',
 							}}
 						>
 							<Feather
 								name="home"
-								size={20}
+								size={22}
 								color={focused ? backgroundColor : cardForegroundColor}
 							/>
 						</View>
@@ -102,20 +100,41 @@ export default function TabLayout() {
 				}}
 			/>
 			<Tabs.Screen
+				name="(discover)"
+				options={{
+					headerShown: false,
+					tabBarIcon: ({ focused }) => (
+						<View
+							style={{
+								padding: 16,
+								borderRadius: 30,
+								backgroundColor: focused ? tabIconSelectedColor : 'transparent',
+							}}
+						>
+							<Fontisto
+								name="nav-icon-grid-a"
+								size={22}
+								color={focused ? backgroundColor : cardForegroundColor}
+							/>
+						</View>
+					),
+				}}
+			/>
+			<Tabs.Screen
 				name="(favorites)"
 				options={{
 					headerShown: false,
 					tabBarIcon: ({ focused }) => (
 						<View
 							style={{
-								padding: 10,
+								padding: 16,
 								borderRadius: 30,
 								backgroundColor: focused ? tabIconSelectedColor : 'transparent',
 							}}
 						>
-							<Feather
-								name="grid"
-								size={20}
+							<Fontisto
+								name="heart-alt"
+								size={22}
 								color={focused ? backgroundColor : cardForegroundColor}
 							/>
 						</View>
@@ -129,14 +148,14 @@ export default function TabLayout() {
 					tabBarIcon: ({ focused }) => (
 						<View
 							style={{
-								padding: 10,
+								padding: 16,
 								borderRadius: 30,
 								backgroundColor: focused ? tabIconSelectedColor : 'transparent',
 							}}
 						>
 							<FontAwesome
 								name="user-o"
-								size={20}
+								size={22}
 								color={focused ? backgroundColor : cardForegroundColor}
 							/>
 						</View>

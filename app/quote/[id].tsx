@@ -34,8 +34,8 @@ export default function QuoteDetailScreen() {
 				style={{ width: width, height: height * 0.45 }}
 			>
 				<LinearGradient
-					colors={['transparent', 'rgba(0,0,0,0.75)']}
-					locations={[0, 0.4]}
+					colors={['transparent', 'rgba(0,0,255,0.25)']}
+					locations={[0, 0.5]}
 					style={{
 						position: 'absolute',
 						left: 0,
@@ -88,18 +88,26 @@ export default function QuoteDetailScreen() {
 					</View>
 
 					{/* Quote Text */}
-					<View className="mx-5 mb-8 p-5 bg-gray-100 rounded-2xl">
+					<ThemedView className="mx-5 mb-8 p-5 rounded-2xl">
 						<FontAwesome name="quote-left" size={24} color="#666" />
-						<ThemedText type="primary">" {quote.text} "</ThemedText>
-					</View>
+						<ThemedText type="mutedForeground">" {quote.text} "</ThemedText>
+					</ThemedView>
 
 					{/* Similar Quotes Section */}
 					<View className="px-5 mb-8">
 						<View className="flex-row justify-between items-center mb-4">
 							<ThemedText type="subtitle">Similar quotes</ThemedText>
-							<ThemedText type="primary">See all</ThemedText>
+							<ThemedText type="muted">See all</ThemedText>
 						</View>
 						{/* Add similar quotes carousel here */}
+						<ScrollView horizontal showsHorizontalScrollIndicator={false}>
+							<View className="flex-row gap-4">
+								<View className="w-48 h-24 rounded-2xl bg-gray-700"></View>
+								<View className="w-48 h-24 rounded-2xl bg-gray-700"></View>
+								<View className="w-48 h-24 rounded-2xl bg-gray-700"></View>
+								<View className="w-48 h-24 rounded-2xl bg-gray-700"></View>
+							</View>
+						</ScrollView>
 					</View>
 				</ScrollView>
 			</ThemedView>
