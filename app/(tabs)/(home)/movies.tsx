@@ -54,7 +54,7 @@ export default function MovieQuotesScreen() {
 	return (
 		<ThemedView className="flex-1">
 			<View
-				className="flex-1 items-center justify-center px-5"
+				className="flex-1 items-center justify-center px-5 relative"
 				style={{ marginTop: SCREEN_HEIGHT * 0.05 }}
 			>
 				<Swiper<Quote>
@@ -88,6 +88,7 @@ export default function MovieQuotesScreen() {
 							title: 'NOPE',
 							style: {
 								label: {
+									opacity: 0.7,
 									backgroundColor: 'transparent',
 									color: '#FF3B30',
 									fontSize: 32,
@@ -112,6 +113,7 @@ export default function MovieQuotesScreen() {
 							title: 'SAVE',
 							style: {
 								label: {
+									opacity: 0.7,
 									backgroundColor: 'transparent',
 									color: Colors[colorScheme ?? 'light'].tint,
 									fontSize: 32,
@@ -134,6 +136,11 @@ export default function MovieQuotesScreen() {
 						},
 					}}
 				/>
+				<View className="absolute bottom-0 left-0 right-0 p-16 mb-24">
+					<ThemedText type="muted" className="text-center">
+						Swipe left to reject, swipe right to save.
+					</ThemedText>
+				</View>
 			</View>
 		</ThemedView>
 	)

@@ -10,7 +10,7 @@ import { ThemedView } from '@/components/ThemedView'
 const Welcome = () => {
 	const { session, isLoading } = useSession()
 
-	if (!isLoading && session) return <Redirect href="/movies" />
+	if (!isLoading && session) return <Redirect href="/(tabs)/(home)/movies" />
 
 	return (
 		<SafeAreaView className="bg-primary h-full">

@@ -8,7 +8,7 @@ export default function AuthLayout() {
 
 	// If user is authenticated, redirect to home
 	if (!isLoading && session) {
-		return <Redirect href="/(home)" />
+		return <Redirect href="/(tabs)/(home)/movies" />
 	}
 
 	return (

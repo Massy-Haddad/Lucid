@@ -72,8 +72,8 @@ export function QuoteCard({ quote, onSave, isActive = true }: QuoteCardProps) {
 						colors={[
 							'transparent',
 							`hsla(${
-								colorScheme === 'dark' ? '222.2 84% 4.9%' : '0 0% 0%'
-							} / 0.85)`,
+								colorScheme === 'dark' ? '255 0% 0%' : '0 0% 0%'
+							} / 0.80)`,
 						]}
 						locations={[0, 0.5]}
 						style={{
@@ -81,7 +81,7 @@ export function QuoteCard({ quote, onSave, isActive = true }: QuoteCardProps) {
 							left: 0,
 							right: 0,
 							bottom: 0,
-							height: '100%',
+							height: '85%',
 						}}
 					/>
 					<View className="flex-1 p-4 justify-end">
@@ -101,7 +101,7 @@ export function QuoteCard({ quote, onSave, isActive = true }: QuoteCardProps) {
 						{/* Content */}
 						<View className="gap-3">
 							<View>
-								<ThemedText type="subtitle" className="leading-5 mb-1">
+								<ThemedText type="subtitle" className="leading-6 mb-1">
 									{quote.text}
 								</ThemedText>
 
@@ -132,7 +132,7 @@ export function QuoteCard({ quote, onSave, isActive = true }: QuoteCardProps) {
 								<TouchableOpacity>
 									<BlurView
 										intensity={50}
-										className="flex-row items-center justify-between mx-2 my-2 p-2 rounded-full overflow-hidden"
+										className="flex-row items-center justify-between mx-4 my-2 p-1 rounded-full overflow-hidden"
 										style={{
 											backgroundColor: `hsla(${
 												colorScheme === 'dark'

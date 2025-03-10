@@ -31,11 +31,11 @@ export default function QuoteDetailScreen() {
 			<ImageBackground
 				source={quote.backgroundImage}
 				className="flex-1"
-				style={{ width: width, height: height * 0.3 }}
+				style={{ width: width, height: height * 0.45 }}
 			>
 				<LinearGradient
-					colors={['transparent', 'rgba(0,0,0,0.85)']}
-					locations={[0, 0.5]}
+					colors={['transparent', 'rgba(0,0,0,0.75)']}
+					locations={[0, 0.4]}
 					style={{
 						position: 'absolute',
 						left: 0,
@@ -48,7 +48,7 @@ export default function QuoteDetailScreen() {
 				<View className="absolute left-5 z-10" style={{ top: insets.top + 5 }}>
 					<TouchableOpacity
 						onPress={() => router.back()}
-						className="w-10 h-10 rounded-full bg-black/20 items-center justify-center"
+						className="w-10 h-10 rounded-full bg-black/30 items-center justify-center"
 					>
 						<Feather name="chevron-left" size={28} color="#FFF" />
 					</TouchableOpacity>
@@ -73,7 +73,7 @@ export default function QuoteDetailScreen() {
 			{/* Content Card */}
 			<ThemedView
 				className="absolute bottom-0 left-0 right-0 rounded-t-[30px] overflow-hidden"
-				style={{ minHeight: height * 0.8 }}
+				style={{ minHeight: height * 0.65 }}
 			>
 				<ScrollView className="flex-1">
 					{/* Author Info */}

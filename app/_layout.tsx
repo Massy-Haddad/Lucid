@@ -156,24 +156,7 @@ function RootLayoutNav() {
 					>
 						<Stack.Screen name="index" options={{ headerShown: false }} />
 						<Stack.Screen name="(auth)" options={{ headerShown: false }} />
-						<Stack.Screen
-							name="(home)"
-							options={{
-								headerLeft: () => <HeaderLeft />,
-								headerRight: () => <HeaderRight />,
-								headerTitle: () => <HeaderTitle />,
-								headerStyle: {
-									backgroundColor: backgroundColor,
-									borderBottomWidth: 1,
-									borderBottomColor: borderColor,
-									height: 60,
-								} as HeaderStyle,
-								headerTitleStyle: {
-									fontSize: 18,
-									fontWeight: '600',
-								},
-							}}
-						/>
+						<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 						<Stack.Screen name="quote/[id]" options={{ headerShown: false }} />
 					</Stack>
 				</QuotesProvider>
