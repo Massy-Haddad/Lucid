@@ -1,150 +1,170 @@
-import { Image, StyleSheet, Platform, View, Button, Text } from 'react-native';
+import {
+  CameraMode,
+  CameraType,
+  CameraView,
+  useCameraPermissions,
+} from "expo-camera";
+import { useRef, useState, useEffect } from "react";
+import { Button, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image } from "expo-image";
+import { AntDesign } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
+import { FontAwesome6 } from "@expo/vector-icons";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function App() {
+  const [permission, requestPermission] = useCameraPermissions();
+  const ref = useRef<CameraView>(null);
+  const [uri, setUri] = useState<string | null>(null);
+  const [mode, setMode] = useState<CameraMode>("picture");
+  const [facing, setFacing] = useState<CameraType>("back");
+  const [recording, setRecording] = useState(false);
 
-import Tesseract from 'tesseract.js';
-import React, { useRef, useState } from 'react';
-import { RNCamera } from 'react-native-camera';
+  useEffect(() => {
+    console.log("Permission:", permission);
+  }, [permission]);
 
-const App = () => {
-  const cameraRef = useRef<RNCamera>(null);
-  const [imageUri, setImageUri] = useState<string | null>(null);
-  const [text, setText] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
+  if (!permission) {
+    console.log("No permission object");
+    return null;
+  }
+
+  if (!permission.granted) {
+    console.log("Permission not granted");
+    return (
+      <View style={styles.container}>
+        <Text style={{ textAlign: "center" }}>
+          We need your permission to use the camera
+        </Text>
+        <Button onPress={requestPermission} title="Grant permission" />
+      </View>
+    );
+  }
 
   const takePicture = async () => {
-    if (cameraRef.current && !isProcessing) {
-      setIsProcessing(true);
-      const options = { quality: 0.5, base64: true };
-      const data = await cameraRef.current.takePictureAsync(options);
-      setImageUri(data.uri);
-      await recognizeText(data.uri);
-      setIsProcessing(false);
-    }
+    const photo = await ref.current?.takePictureAsync();
+    setUri(photo?.uri);
   };
 
-  const recognizeText = async (imageUri: Tesseract.ImageLike) => {
-    try {
-      const result = await Tesseract.recognize(imageUri, 'fra');
-      setText(result.data.text);
-    } catch (error) {
-      console.error('Erreur lors de la reconnaissance de texte :', error);
-      setText('Erreur lors de la reconnaissance de texte');
+  const recordVideo = async () => {
+    if (recording) {
+      setRecording(false);
+      ref.current?.stopRecording();
+      return;
     }
+    setRecording(true);
+    const video = await ref.current?.recordAsync();
+    console.log({ video });
+  };
+
+  const toggleMode = () => {
+    setMode((prev) => (prev === "picture" ? "video" : "picture"));
+  };
+
+  const toggleFacing = () => {
+    setFacing((prev) => (prev === "back" ? "front" : "back"));
+  };
+
+  const renderPicture = () => {
+    return (
+      <View>
+        <Image
+          source={{ uri }}
+          contentFit="contain"
+          style={{ width: 300, aspectRatio: 1 }}
+        />
+        <Button onPress={() => setUri(null)} title="Take another picture" />
+      </View>
+    );
+  };
+
+  const renderCamera = () => {
+    return (
+      <CameraView
+        style={styles.camera}
+        ref={ref}
+        mode={mode}
+        facing={facing}
+        mute={false}
+        responsiveOrientationWhenOrientationLocked
+      >
+        <View style={styles.shutterContainer}>
+          <Pressable onPress={toggleMode}>
+            {mode === "picture" ? (
+              <AntDesign name="picture" size={32} color="white" />
+            ) : (
+              <Feather name="video" size={32} color="white" />
+            )}
+          </Pressable>
+          <Pressable onPress={mode === "picture" ? takePicture : recordVideo}>
+            {({ pressed }) => (
+              <View
+                style={[
+                  styles.shutterBtn,
+                  {
+                    opacity: pressed ? 0.5 : 1,
+                  },
+                ]}
+              >
+                <View
+                  style={[
+                    styles.shutterBtnInner,
+                    {
+                      backgroundColor: mode === "picture" ? "white" : "red",
+                    },
+                  ]}
+                />
+              </View>
+            )}
+          </Pressable>
+          <Pressable onPress={toggleFacing}>
+            <FontAwesome6 name="rotate-left" size={32} color="white" />
+          </Pressable>
+        </View>
+      </CameraView>
+    );
   };
 
   return (
     <View style={styles.container}>
-      <RNCamera
-        ref={cameraRef}
-        style={styles.preview}
-        type={RNCamera.Constants.Type.back}
-        captureAudio={false}
-      >
-        <View style={styles.captureContainer}>
-          <Button title="Prendre une photo" onPress={takePicture} />
-        </View>
-      </RNCamera>
-      {imageUri && <Image source={{ uri: imageUri }} style={styles.capturedImage} />}
-      {text ? <Text style={styles.text}>Texte reconnu: {text}</Text> : null}
+      {uri ? renderPicture() : renderCamera()}
     </View>
-  );
-};
-
-export default function HomeScreen() {
-  return (
-    <><ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={<Image
-        source={require('@/assets/images/partial-react-logo.png')}
-        style={styles.reactLogo} />}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView><App /></>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
   container: {
     flex: 1,
-    flexDirection: 'column',
-    backgroundColor: 'white',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  preview: {
+  camera: {
     flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    width: "100%",
   },
-  captureContainer: {
-    flex: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 20,
+  shutterContainer: {
+    position: "absolute",
+    bottom: 44,
+    left: 0,
+    width: "100%",
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 30,
   },
-  capturedImage: {
-    width: 200,
-    height: 200,
-    resizeMode: 'contain',
-    alignSelf: 'center',
-    marginTop: 20,
+  shutterBtn: {
+    backgroundColor: "transparent",
+    borderWidth: 5,
+    borderColor: "white",
+    width: 85,
+    height: 85,
+    borderRadius: 45,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  text: {
-    color: 'white',
-    fontSize: 16,
-    marginTop: 20,
-    textAlign: 'center',
+  shutterBtnInner: {
+    width: 70,
+    height: 70,
+    borderRadius: 50,
   },
 });
-
