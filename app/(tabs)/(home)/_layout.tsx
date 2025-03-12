@@ -78,6 +78,12 @@ export default function HomeLayout() {
 					}}
 				>
 					<Tab.Screen
+						name="philosophy"
+						options={{
+							title: 'Philosophy',
+						}}
+					/>
+					<Tab.Screen
 						name="movies"
 						options={{
 							title: 'Movies',

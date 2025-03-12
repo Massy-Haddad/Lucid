@@ -10,6 +10,7 @@ const STORAGE_KEY = '@quotes_storage'
 interface QuotesContextType extends QuotesState {
 	fetchMovieQuotes: (force?: boolean) => Promise<void>
 	fetchAnimeQuotes: (force?: boolean) => Promise<void>
+	fetchPhilosophyQuotes: (force?: boolean) => Promise<void>
 	saveQuote: (quote: Quote) => Promise<void>
 	removeQuote: (id: string) => Promise<void>
 	isQuoteSaved: (id: string) => boolean
@@ -249,8 +250,63 @@ export function QuotesProvider({ children }: { children: React.ReactNode }) {
 		}
 	}
 
+	const fetchPhilosophyQuotes = async (force: boolean = false) => {
+		try {
+			// Only fetch if we're running low on quotes or forced
+			if (
+				!force &&
+				state.philosophyQuotes.length > state.currentQuoteIndex + 5
+			) {
+				return
+			}
+
+			if (state.philosophyQuotes.length === 0) {
+				dispatch({ type: 'SET_LOADING', payload: true })
+			} else {
+				dispatch({ type: 'SET_LOADING_MORE', payload: true })
+			}
+
+			const quotes = await api.ninjas.getRandomQuotes({ count: 5 })
+
+			if (state.philosophyQuotes.length === 0) {
+				dispatch({ type: 'SET_PHILOSOPHY_QUOTES', payload: quotes })
+			} else {
+				dispatch({ type: 'ADD_PHILOSOPHY_QUOTES', payload: quotes })
+			}
+		} catch (error) {
+			console.error('Error fetching philosophy quotes:', error)
+			if (state.philosophyQuotes.length === 0) {
+				dispatch({
+					type: 'SET_PHILOSOPHY_QUOTES',
+					payload: [
+						{
+							id: 'fallback-philosophy-1',
+							text: 'I think, therefore I am.',
+							author: 'René Descartes',
+							source: 'Philosophy',
+							type: 'philosophy',
+						},
+						{
+							id: 'fallback-philosophy-2',
+							text: 'The unexamined life is not worth living.',
+							author: 'Socrates',
+							source: 'Philosophy',
+							type: 'philosophy',
+						},
+					],
+				})
+			}
+		} finally {
+			dispatch({ type: 'SET_LOADING', payload: false })
+			dispatch({ type: 'SET_LOADING_MORE', payload: false })
+		}
+	}
+
 	// Watch currentQuoteIndex and fetch more quotes when needed
 	useEffect(() => {
+		if (state.philosophyQuotes.length > 0) {
+			fetchPhilosophyQuotes()
+		}
 		if (state.movieQuotes.length > 0) {
 			fetchMovieQuotes()
 		}
@@ -269,6 +325,7 @@ export function QuotesProvider({ children }: { children: React.ReactNode }) {
 				...state,
 				fetchMovieQuotes,
 				fetchAnimeQuotes,
+				fetchPhilosophyQuotes,
 				saveQuote,
 				removeQuote,
 				isQuoteSaved,

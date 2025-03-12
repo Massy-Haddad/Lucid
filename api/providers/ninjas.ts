@@ -13,15 +13,12 @@ interface NinjasQuoteResponse {
 /**
  * Format raw quote from API to match our Quote type
  */
-const formatQuote = (
-	quote: NinjasQuoteResponse,
-	type: 'movie' | 'anime'
-): Quote => ({
+const formatQuote = (quote: NinjasQuoteResponse): Quote => ({
 	id: `${quote.author}-${Date.now()}-${Math.random()}`, // Generate a unique ID
 	text: quote.quote,
 	author: quote.author,
 	source: quote.category,
-	type,
+	type: 'philosophy',
 })
 
 /**
@@ -32,16 +29,13 @@ const formatQuote = (
 const getRandomQuotes = async function (
 	params: {
 		count?: number
-		category?: string
 		[key: string]: string | number | boolean | undefined
 	} = { count: 5 }
 ) {
 	try {
 		const quotes: Quote[] = []
 		const count = params.count || 5
-		const url = `${NINJAS_BASE_URL}/quotes${
-			params.category ? `?category=${params.category}` : ''
-		}`
+		const url = `${NINJAS_BASE_URL}/quotes`
 
 		// Make multiple API calls to get desired number of quotes
 		for (let i = 0; i < count; i++) {
@@ -53,12 +47,7 @@ const getRandomQuotes = async function (
 				})
 
 				if (Array.isArray(response) && response.length > 0) {
-					quotes.push(
-						formatQuote(
-							response[0],
-							params.category === 'wisdom' ? 'anime' : 'movie'
-						)
-					)
+					quotes.push(formatQuote(response[0]))
 				}
 			} catch (err) {
 				console.warn(`Failed to fetch quote ${i + 1}:`, err)

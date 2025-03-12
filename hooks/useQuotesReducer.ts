@@ -4,6 +4,7 @@ import { QuotesState, QuotesAction, Quote } from '@/types/quote'
 const initialState: QuotesState = {
 	movieQuotes: [],
 	animeQuotes: [],
+	philosophyQuotes: [],
 	savedQuotes: [],
 	isLoading: false,
 	isLoadingMore: false,
@@ -44,6 +45,18 @@ function quotesReducer(state: QuotesState, action: QuotesAction): QuotesState {
 				...state,
 				animeQuotes: removeDuplicates([
 					...state.animeQuotes,
+					...action.payload,
+				]),
+			}
+
+		case 'SET_PHILOSOPHY_QUOTES':
+			return { ...state, philosophyQuotes: removeDuplicates(action.payload) }
+
+		case 'ADD_PHILOSOPHY_QUOTES':
+			return {
+				...state,
+				philosophyQuotes: removeDuplicates([
+					...state.philosophyQuotes,
 					...action.payload,
 				]),
 			}
