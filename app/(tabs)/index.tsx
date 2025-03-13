@@ -10,6 +10,7 @@ import { Image } from "expo-image";
 import { AntDesign } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { FontAwesome6 } from "@expo/vector-icons";
+import MlkitOcr from 'react-native-mlkit-ocr'; // npm install react-native-mlkit-ocr
 
 export default function App() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -18,9 +19,10 @@ export default function App() {
   const [mode, setMode] = useState<CameraMode>("picture");
   const [facing, setFacing] = useState<CameraType>("back");
   const [recording, setRecording] = useState(false);
+  const [trueUri, setTrueUri] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("Permission:", permission);
+    //console.log("Permission:", permission);
   }, [permission]);
 
   if (!permission) {
@@ -42,7 +44,11 @@ export default function App() {
 
   const takePicture = async () => {
     const photo = await ref.current?.takePictureAsync();
-    setUri(photo?.uri);
+    setUri(photo?.uri); // seulement utiliser pour se deplacer entre les deux page de l'exemple
+    setTrueUri(photo?.uri);
+    console.log(trueUri);
+    const resultFromUri = await MlkitOcr.detectFromUri(photo?.uri);
+    console.log(resultFromUri); // retourne rien c'est peut etre un probleme de compatibilité avec l'ios
   };
 
   const recordVideo = async () => {
@@ -151,6 +157,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 30,
+    marginBottom: 100,
   },
   shutterBtn: {
     backgroundColor: "transparent",
