@@ -10,7 +10,8 @@ import { Image } from "expo-image";
 import { AntDesign } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { FontAwesome6 } from "@expo/vector-icons";
-import MlkitOcr from 'react-native-mlkit-ocr'; // npm install react-native-mlkit-ocr
+//import MlkitOcr from 'react-native-mlkit-ocr'; marche pas:(
+import { FirebaseMLVision } from '@react-native-firebase/ml-vision';
 
 export default function App() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -20,6 +21,18 @@ export default function App() {
   const [facing, setFacing] = useState<CameraType>("back");
   const [recording, setRecording] = useState(false);
   const [trueUri, setTrueUri] = useState<string | null>(null);
+
+  const processImageForOCR = async (imageUri) => {
+    try {
+      const processedImage = await FirebaseMLVision.cloudDocumentTextRecognizerProcessImage(
+        imageUri
+      );
+      const recognizedText = processedImage.text;
+      return recognizedText;
+    } catch (error) {
+      console.error('Error processing image for OCR:', error);
+    }
+  };
 
   useEffect(() => {
     //console.log("Permission:", permission);
@@ -46,9 +59,19 @@ export default function App() {
     const photo = await ref.current?.takePictureAsync();
     setUri(photo?.uri); // seulement utiliser pour se deplacer entre les deux page de l'exemple
     setTrueUri(photo?.uri);
-    console.log(trueUri);
-    const resultFromUri = await MlkitOcr.detectFromUri(photo?.uri);
-    console.log(resultFromUri); // retourne rien c'est peut etre un probleme de compatibilité avec l'ios
+    console.log("uri:",photo?.uri);
+    // console.log(MlkitOcr); DE L'OSTIE DE MARDE https://github.com/agoldis/react-native-mlkit-ocr/issues/33
+    // if (MlkitOcr) {
+    //   try {
+    //     const resultFromUri = await MlkitOcr.detectFromUri(photo?.uri);
+    //     //console.log(resultFromUri); // retourne rien c'est peut etre un probleme de compatibilité avec l'ios
+    //   } catch (error) {
+    //     console.error("Error MlkitOcr text:", error);
+    //   }
+    // } else {
+    //   console.error("MlkitOcr is not initialized");
+    // }
+    processImageForOCR(photo?.uri);
   };
 
   const recordVideo = async () => {
