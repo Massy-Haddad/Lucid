@@ -11,6 +11,51 @@ interface NinjasQuoteResponse {
 }
 
 /**
+ * Helper Functions
+ */
+const extractTags = (quote: NinjasQuoteResponse): string[] => {
+	const tags: string[] = []
+
+	// Add category as a tag
+	if (quote.category) {
+		tags.push(quote.category.toLowerCase())
+	}
+
+	// Extract themes from quote text
+	const text = quote.quote.toLowerCase()
+	const commonThemes = [
+		'life',
+		'wisdom',
+		'love',
+		'truth',
+		'knowledge',
+		'happiness',
+		'success',
+		'courage',
+		'freedom',
+		'power',
+		'change',
+		'hope',
+		'faith',
+		'destiny',
+		'spirit',
+		'mind',
+		'soul',
+		'heart',
+		'strength',
+		'peace',
+	]
+
+	commonThemes.forEach((theme) => {
+		if (text.includes(theme)) {
+			tags.push(theme)
+		}
+	})
+
+	return [...new Set(tags)] // Remove duplicates
+}
+
+/**
  * Format raw quote from API to match our Quote type
  */
 const formatQuote = (quote: NinjasQuoteResponse): Quote => ({
@@ -19,6 +64,7 @@ const formatQuote = (quote: NinjasQuoteResponse): Quote => ({
 	author: quote.author,
 	source: quote.category,
 	type: 'philosophy',
+	tags: extractTags(quote),
 })
 
 /**
@@ -50,7 +96,7 @@ const getRandomQuotes = async function (
 					quotes.push(formatQuote(response[0]))
 				}
 			} catch (err) {
-				console.warn(`Failed to fetch quote ${i + 1}:`, err)
+				console.warn(`[NinjasProvider] Failed to fetch quote ${i + 1}:`, err)
 			}
 		}
 
@@ -60,7 +106,7 @@ const getRandomQuotes = async function (
 
 		return quotes
 	} catch (error) {
-		console.error('API Error:', error)
+		console.error('[NinjasProvider] API Error:', error)
 		throw error
 	}
 }

@@ -59,6 +59,7 @@ export default function MovieQuotesScreen() {
 						if (!quote) return null
 						return (
 							<QuoteCard
+								key={quote.id}
 								quote={quote}
 								isActive={cardIndex === 0}
 								isSaved={isQuoteSaved(quote.id)}
@@ -71,7 +72,7 @@ export default function MovieQuotesScreen() {
 					}}
 					cardIndex={0}
 					backgroundColor="transparent"
-					infinite
+					infinite={false}
 					stackSize={3}
 					stackScale={0.95}
 					stackSeparation={22}
@@ -84,6 +85,7 @@ export default function MovieQuotesScreen() {
 					showSecondCard
 					disableBottomSwipe={false}
 					goBackToPreviousCardOnSwipeBottom
+					keyExtractor={(card) => card.id}
 				/>
 				<View className="absolute bottom-0 left-0 right-0 p-16 mb-28">
 					<ThemedText type="muted" className="text-center">

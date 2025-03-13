@@ -6,6 +6,7 @@ export interface Quote {
 	author: string
 	source: string
 	type: QuoteType
+	tags: string[]
 	backgroundImage?: any // ImageSourcePropType from react-native
 	savedAt?: string
 }
