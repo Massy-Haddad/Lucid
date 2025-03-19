@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Quote, QuotesState, FirestoreQuote } from '@/types/quote'
 import { firebaseService } from '@/api/providers/firebase'
 import { useQuotesReducer } from '@/hooks/useQuotesReducer'
+import { useSession } from '@/context/AuthProvider'
 import api from '@/api'
 
 const STORAGE_KEY = '@quotes_storage'
@@ -22,14 +23,12 @@ const QuotesContext = createContext<QuotesContextType>({} as QuotesContextType)
 
 export function QuotesProvider({ children }: { children: React.ReactNode }) {
 	const [state, dispatch] = useQuotesReducer()
+	const { session } = useSession()
 
-	// Initialize anonymous auth on mount
+	// Set up real-time listener for saved quotes only when user is authenticated
 	useEffect(() => {
-		firebaseService.initializeAnonymousAuth()
-	}, [])
+		if (!session) return
 
-	// Set up real-time listener for saved quotes
-	useEffect(() => {
 		const unsubscribe = firebaseService.subscribeToSavedQuotes(
 			(quotes) => {
 				dispatch({ type: 'SET_SAVED_QUOTES', payload: quotes })
@@ -49,7 +48,7 @@ export function QuotesProvider({ children }: { children: React.ReactNode }) {
 		)
 
 		return () => unsubscribe()
-	}, [])
+	}, [session])
 
 	const loadSavedQuotes = useCallback(async () => {
 		try {
