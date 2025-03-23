@@ -1,4 +1,5 @@
 import { Quote } from '@/types/quote'
+import { getQuoteImage } from '@/utils/imageMapping'
 
 interface AnimeQuote {
 	quote: string
@@ -16,7 +17,10 @@ interface AnimeQuotesOptions {
 class AnimeQuotesProvider {
 	private baseUrl = 'https://yurippe.vercel.app/api/quotes'
 
-	private transformQuote(quote: AnimeQuote): Quote {
+	private transformQuote = (quote: AnimeQuote): Quote => {
+		// Use the quote's ID to ensure each quote gets a unique background image
+		const imageSource = `anime-${quote._id}`
+
 		return {
 			id: `anime-${quote._id}`,
 			text: quote.quote,
@@ -24,6 +28,7 @@ class AnimeQuotesProvider {
 			source: quote.show,
 			type: 'anime',
 			tags: [],
+			backgroundImage: getQuoteImage(imageSource, 'anime'),
 		}
 	}
 
@@ -46,6 +51,10 @@ class AnimeQuotesProvider {
 			const response = await fetch(url)
 
 			if (!response.ok) {
+				// If the search returns no results, return an empty array instead of throwing
+				if (response.status === 404) {
+					return []
+				}
 				throw new Error('Failed to fetch anime quotes')
 			}
 
@@ -55,7 +64,8 @@ class AnimeQuotesProvider {
 			return quotes.map(this.transformQuote)
 		} catch (error) {
 			console.error('[AnimeQuotesProvider] Error fetching quotes:', error)
-			throw error
+			// Return empty array on error instead of throwing
+			return []
 		}
 	}
 

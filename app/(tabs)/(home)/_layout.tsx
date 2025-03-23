@@ -47,13 +47,13 @@ export default function HomeLayout() {
 				className="flex-1"
 			>
 				<View className="px-5">
-					<ThemedTextInput
+					{/* <ThemedTextInput
 						icon="search"
 						placeholder="Search"
 						value={search}
 						onChangeText={setSearch}
 						rounded="full"
-					/>
+					/> */}
 				</View>
 				<Tab
 					screenOptions={{

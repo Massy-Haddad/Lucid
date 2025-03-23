@@ -33,9 +33,10 @@ export function getQuoteImage(
 			imageSet = Images.quotes.movies
 			break
 		case 'philosophy':
-		case 'history':
-		default:
 			imageSet = Images.quotes.history
+			break
+		default:
+			imageSet = Images.quotes.animes
 	}
 
 	const imageKeys = Object.keys(imageSet)
@@ -47,6 +48,6 @@ export function getQuoteImage(
 // Preload all images for better performance
 export const preloadedImages = {
 	animes: Object.values(Images.quotes.animes as ImageSet),
-	history: Object.values(Images.quotes.history as ImageSet),
 	movies: Object.values(Images.quotes.movies as ImageSet),
+	philosophy: Object.values(Images.quotes.history as ImageSet),
 }

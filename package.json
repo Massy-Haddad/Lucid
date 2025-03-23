@@ -21,6 +21,7 @@
     "@react-native-firebase/auth": "^20.5.0",
     "@react-native-firebase/firestore": "^20.5.0",
     "@react-native-ml-kit/text-recognition": "^1.5.2",
+    "@react-native-picker/picker": "^2.11.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/material-top-tabs": "^7.1.1",
     "@react-navigation/native": "^7.0.14",

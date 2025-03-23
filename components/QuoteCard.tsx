@@ -68,8 +68,8 @@ export function QuoteCard({
 
 	// Get the background image once and memoize it
 	const backgroundImage = React.useMemo(
-		() => getQuoteImage(quote.source, quote.type),
-		[quote.source, quote.type]
+		() => quote.backgroundImage || getQuoteImage(quote.source, quote.type),
+		[quote.backgroundImage, quote.source, quote.type]
 	)
 
 	// Add animated style for vertical list animation
