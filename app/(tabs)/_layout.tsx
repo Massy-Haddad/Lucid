@@ -4,6 +4,7 @@ import { ThemedText } from '@/components/ThemedText'
 import { Feather, FontAwesome, Fontisto } from '@expo/vector-icons'
 import { useThemeColor } from '@/hooks/useThemeColor'
 import { useSession } from '@/context/AuthProvider'
+import React from 'react'
 
 export default function TabLayout() {
 	const { session } = useSession()
@@ -144,7 +145,15 @@ export default function TabLayout() {
 			<Tabs.Screen
 				name="(account)"
 				options={{
-					headerShown: false,
+					headerShown: true,
+					headerTitle: 'Account',
+					headerTitleAlign: 'center',
+					headerTitleStyle: {
+						fontSize: 24,
+						fontWeight: '600',
+						fontFamily: 'Lexend',
+					},
+					headerRight: () => <></>,
 					tabBarIcon: ({ focused }) => (
 						<View
 							style={{

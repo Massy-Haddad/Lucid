@@ -87,7 +87,10 @@ export function QuotesProvider({ children }: { children: React.ReactNode }) {
 
 				// Mark quote as being saved
 				const quoteWithSavingFlag = { ...quote, _isSaving: true }
-				dispatch({ type: 'ADD_SAVED_QUOTE', payload: quoteWithSavingFlag })
+				dispatch({
+					type: 'ADD_SAVED_QUOTE',
+					payload: quoteWithSavingFlag as FirestoreQuote,
+				})
 
 				const savedQuote = await firebaseService.saveQuote(quote)
 
