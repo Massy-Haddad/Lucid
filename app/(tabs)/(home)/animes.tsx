@@ -1,19 +1,63 @@
 import React, { useEffect } from 'react'
-import { View, ActivityIndicator } from 'react-native'
-import Swiper from 'react-native-deck-swiper'
+import { View, ActivityIndicator, Dimensions } from 'react-native'
 import { QuoteCard } from '@/components/QuoteCard'
 import { useQuotes } from '@/context/QuotesContext'
 import { Colors } from '@/constants/Colors'
 import { useColorScheme } from '@/hooks/useColorScheme'
-import { Quote } from '@/types/quote'
 import { ThemedText } from '@/components/ThemedText'
+import { VerticalList } from '@/components/VerticalList'
+import { useThemeColor } from '@/hooks/useThemeColor'
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 export default function AnimeQuotesScreen() {
-	return (
-		<View className="flex-1 bg-black/5">
-			<View className="flex-1">
-				<ThemedText type="title">Animes</ThemedText>
+	const {
+		animeQuotes,
+		currentQuoteIndex,
+		setCurrentQuoteIndex,
+		fetchAnimeQuotes,
+		saveQuote,
+		isQuoteSaved,
+		isLoading,
+	} = useQuotes()
+	const colorScheme = useColorScheme()
+	const textColor = useThemeColor({}, 'text')
+	const background = useThemeColor({}, 'background')
+
+	useEffect(() => {
+		fetchAnimeQuotes()
+	}, [])
+
+	if (isLoading && animeQuotes.length === 0) {
+		return (
+			<View
+				className="flex-1 items-center justify-center"
+				style={{ backgroundColor: background }}
+			>
+				<ActivityIndicator
+					size="large"
+					color={Colors[colorScheme ?? 'light'].text}
+				/>
 			</View>
+		)
+	}
+
+	if (animeQuotes.length === 0) {
+		return (
+			<View
+				className="flex-1 items-center justify-center"
+				style={{ backgroundColor: background }}
+			>
+				<ThemedText type="title" className="text-center">
+					No anime quotes available
+				</ThemedText>
+			</View>
+		)
+	}
+
+	return (
+		<View className="flex-1" style={{ backgroundColor: background }}>
+			<VerticalList data={animeQuotes} />
 		</View>
 	)
 }

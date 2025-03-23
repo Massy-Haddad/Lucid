@@ -5,6 +5,7 @@ import { firebaseService } from '@/api/providers/firebase'
 import { useQuotesReducer } from '@/hooks/useQuotesReducer'
 import { useSession } from '@/context/AuthProvider'
 import api from '@/api'
+import { animeService } from '@/api/providers/animes'
 
 const STORAGE_KEY = '@quotes_storage'
 
@@ -75,14 +76,34 @@ export function QuotesProvider({ children }: { children: React.ReactNode }) {
 					return
 				}
 
+				// Check if we're already saving this quote to prevent duplicate saves
+				const isCurrentlySaving = state.savedQuotes.some(
+					(q) => q.id === quote.id && q._isSaving
+				)
+				if (isCurrentlySaving) {
+					console.log('[QuotesContext] Quote is already being saved:', quote.id)
+					return
+				}
+
+				// Mark quote as being saved
+				const quoteWithSavingFlag = { ...quote, _isSaving: true }
+				dispatch({ type: 'ADD_SAVED_QUOTE', payload: quoteWithSavingFlag })
+
 				const savedQuote = await firebaseService.saveQuote(quote)
-				dispatch({ type: 'ADD_SAVED_QUOTE', payload: savedQuote })
+
+				// Remove the saving flag and update with the saved quote
+				const finalQuote = { ...savedQuote, _isSaving: false }
+				dispatch({ type: 'UPDATE_SAVED_QUOTE', payload: finalQuote })
 
 				// Update local storage as backup
-				const updatedQuotes = [savedQuote, ...state.savedQuotes]
+				const updatedQuotes = state.savedQuotes.map((q) =>
+					q.id === quote.id ? finalQuote : q
+				)
 				await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedQuotes))
 			} catch (error) {
 				console.error('[QuotesContext] Error saving quote:', error)
+				// Remove the quote if saving failed
+				dispatch({ type: 'REMOVE_SAVED_QUOTE', payload: quote.id })
 				throw error
 			}
 		},
@@ -168,42 +189,14 @@ export function QuotesProvider({ children }: { children: React.ReactNode }) {
 				payload: true,
 			})
 
-			const response = await api.ninjas.getRandomQuotes({ count: 10 })
-			const animelikeQuotes = response
-				.filter((quote) =>
-					quote.tags.some((tag) =>
-						[
-							'life',
-							'dream',
-							'destiny',
-							'heart',
-							'soul',
-							'spirit',
-							'power',
-							'strength',
-							'courage',
-							'friend',
-							'hope',
-							'future',
-							'fate',
-							'journey',
-							'warrior',
-							'hero',
-							'believe',
-							'faith',
-							'path',
-							'wisdom',
-						].includes(tag)
-					)
-				)
-				.map((quote) => ({ ...quote, type: 'anime' as const }))
+			const quotes = await animeService.getRandomQuotes()
 
 			dispatch({
 				type:
 					state.animeQuotes.length === 0
 						? 'SET_ANIME_QUOTES'
 						: 'ADD_ANIME_QUOTES',
-				payload: animelikeQuotes,
+				payload: quotes,
 			})
 		} catch (error) {
 			console.error('[QuotesContext] Error fetching anime quotes:', error)

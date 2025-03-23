@@ -5,6 +5,7 @@ import {
 	ImageBackground,
 	Dimensions,
 	ViewStyle,
+	StyleSheet,
 } from 'react-native'
 import {
 	Feather,
@@ -17,6 +18,11 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { useColorScheme } from '@/hooks/useColorScheme'
 import { useRouter } from 'expo-router'
 import { getQuoteImage } from '@/utils/imageMapping'
+import Animated, {
+	useAnimatedStyle,
+	SharedValue,
+	interpolate,
+} from 'react-native-reanimated'
 
 import { Quote } from '@/types/quote'
 import { ThemedText } from '@/components/ThemedText'
@@ -25,6 +31,7 @@ import { Colors } from '@/constants/Colors'
 import { useQuotes } from '@/context/QuotesContext'
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window')
+const _spacing = 4
 
 export interface QuoteCardProps {
 	quote: Quote
@@ -33,6 +40,9 @@ export interface QuoteCardProps {
 	isSaved?: boolean
 	style?: ViewStyle
 	variant?: 'grid' | 'swiper'
+	index?: number
+	scrollY?: SharedValue<number>
+	itemSize?: number
 }
 
 export function QuoteCard({
@@ -41,6 +51,9 @@ export function QuoteCard({
 	isActive,
 	style,
 	variant = 'swiper',
+	index,
+	scrollY,
+	itemSize = SCREEN_HEIGHT * 0.5,
 }: QuoteCardProps) {
 	const colorScheme = useColorScheme()
 	const textColor = useThemeColor({}, 'text')
@@ -50,43 +63,65 @@ export function QuoteCard({
 	const mutedForegroundColor = useThemeColor({}, 'mutedForeground')
 	const router = useRouter()
 	const { isQuoteSaved, saveQuote, removeQuote, savedQuotes } = useQuotes()
-	const [isSaved, setIsSaved] = useState(false)
+	const [isSaved, setIsSaved] = React.useState(() => isQuoteSaved(quote.id))
 	const isGrid = variant === 'grid'
 
 	// Get the background image once and memoize it
-	const backgroundImage = getQuoteImage(quote.id, quote.source)
+	const backgroundImage = React.useMemo(
+		() => getQuoteImage(quote.source, quote.type),
+		[quote.source, quote.type]
+	)
 
-	useEffect(() => {
+	// Add animated style for vertical list animation
+	const animatedStyle = useAnimatedStyle(() => {
+		if (!scrollY || typeof index === 'undefined') return {}
+
+		return {
+			opacity: interpolate(
+				scrollY.value,
+				[index - 1, index, index + 1],
+				[0.2, 1, 0.2]
+			),
+			transform: [
+				{
+					scale: interpolate(
+						scrollY.value,
+						[index - 1, index, index + 1],
+						[0.9, 1, 0.9]
+					),
+				},
+			],
+		}
+	})
+
+	// Update saved state only when the quote's saved status changes in the context
+	React.useEffect(() => {
 		const saved = isQuoteSaved(quote.id)
 		if (saved !== isSaved) {
-			console.log(
-				`[QuoteCard] Quote ${quote.author} saved status changed to:`,
-				saved
-			)
 			setIsSaved(saved)
 		}
-	}, [quote.id, savedQuotes, isSaved])
+	}, [quote.id, savedQuotes])
 
-	const handleSave = async () => {
+	const handleSave = React.useCallback(async () => {
 		try {
 			const newSavedState = !isSaved
 			setIsSaved(newSavedState)
 
 			if (newSavedState) {
-				console.log(`[QuoteCard] Saving quote from ${quote.author}`)
 				await saveQuote({ ...quote, backgroundImage })
 			} else {
-				console.log(`[QuoteCard] Removing quote from ${quote.author}`)
 				await removeQuote(quote.id)
 			}
 		} catch (error) {
 			console.error('[QuoteCard] Error handling save:', error)
 			setIsSaved(!isSaved)
 		}
-	}
+	}, [quote, isSaved, saveQuote, removeQuote, backgroundImage])
+
+	const CardWrapper = scrollY ? Animated.View : View
 
 	return (
-		<View
+		<CardWrapper
 			className={
 				isGrid
 					? 'rounded-2xl overflow-hidden shadow-lg'
@@ -94,19 +129,25 @@ export function QuoteCard({
 			}
 			style={[
 				{
-					height: SCREEN_HEIGHT * (isGrid ? 0.28 : 0.5),
+					height: isGrid
+						? SCREEN_HEIGHT * 0.28
+						: itemSize || SCREEN_HEIGHT * 0.5,
 					borderColor: borderColor,
 					borderWidth: 1,
+					padding: _spacing * 2,
 				},
+				animatedStyle,
 				style,
 			]}
 		>
 			<ImageBackground
 				source={backgroundImage}
-				className="flex-1 w-full h-full"
-				imageStyle={{ borderRadius: isGrid ? 16 : 24 }}
+				style={StyleSheet.absoluteFillObject}
+				imageStyle={{
+					borderRadius: 16,
+					resizeMode: 'cover',
+				}}
 			>
-				{/* Gradient Overlay */}
 				<View className="flex-1">
 					<LinearGradient
 						colors={[
@@ -115,7 +156,7 @@ export function QuoteCard({
 								isGrid ? '0.85' : '0.80'
 							})`,
 						]}
-						locations={isGrid ? [0.2, 0.8] : [0, 0.8]}
+						locations={isGrid ? [0.2, 0.8] : [0, 0.6]}
 						style={{
 							position: 'absolute',
 							left: 0,
@@ -150,7 +191,7 @@ export function QuoteCard({
 								<ThemedText
 									type="subtitle"
 									className={`leading-${isGrid ? '5' : '6'} mb-1`}
-									numberOfLines={isGrid ? 4 : undefined}
+									numberOfLines={isGrid ? 4 : 6}
 									style={isGrid ? { fontSize: 14 } : undefined}
 								>
 									{quote.text}
@@ -242,6 +283,6 @@ export function QuoteCard({
 					</View>
 				</View>
 			</ImageBackground>
-		</View>
+		</CardWrapper>
 	)
 }

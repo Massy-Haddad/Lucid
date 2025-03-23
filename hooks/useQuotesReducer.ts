@@ -78,6 +78,15 @@ function quotesReducer(state: QuotesState, action: QuotesAction): QuotesState {
 			}
 		}
 
+		case 'UPDATE_SAVED_QUOTE': {
+			return {
+				...state,
+				savedQuotes: state.savedQuotes.map((quote) =>
+					quote.id === action.payload.id ? action.payload : quote
+				),
+			}
+		}
+
 		case 'REMOVE_SAVED_QUOTE':
 			return {
 				...state,

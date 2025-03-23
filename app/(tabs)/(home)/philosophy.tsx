@@ -1,96 +1,63 @@
-import React, { useEffect, useRef } from 'react'
-import { View, ActivityIndicator } from 'react-native'
-import Swiper from 'react-native-deck-swiper'
-
-import { Quote } from '@/types/quote'
-import { Colors } from '@/constants/Colors'
+import React, { useEffect } from 'react'
+import { View, ActivityIndicator, Dimensions } from 'react-native'
 import { QuoteCard } from '@/components/QuoteCard'
 import { useQuotes } from '@/context/QuotesContext'
-import { ThemedText } from '@/components/ThemedText'
-import { ThemedView } from '@/components/ThemedView'
+import { Colors } from '@/constants/Colors'
 import { useColorScheme } from '@/hooks/useColorScheme'
+import { ThemedText } from '@/components/ThemedText'
+import { VerticalList } from '@/components/VerticalList'
+import { useThemeColor } from '@/hooks/useThemeColor'
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 export default function PhilosophyQuotesScreen() {
 	const {
 		philosophyQuotes,
-		fetchPhilosophyQuotes,
-		isLoading,
+		currentQuoteIndex,
 		setCurrentQuoteIndex,
+		fetchPhilosophyQuotes,
+		saveQuote,
 		isQuoteSaved,
+		isLoading,
 	} = useQuotes()
 	const colorScheme = useColorScheme()
-	const swiperRef = useRef<Swiper<Quote>>(null)
+	const textColor = useThemeColor({}, 'text')
+	const background = useThemeColor({}, 'background')
 
 	useEffect(() => {
-		fetchPhilosophyQuotes(true)
+		fetchPhilosophyQuotes()
 	}, [])
 
 	if (isLoading && philosophyQuotes.length === 0) {
 		return (
-			<View className="flex-1 justify-center items-center">
+			<View
+				className="flex-1 items-center justify-center"
+				style={{ backgroundColor: background }}
+			>
 				<ActivityIndicator
 					size="large"
-					color={Colors[colorScheme ?? 'light'].tint}
+					color={Colors[colorScheme ?? 'light'].text}
 				/>
-				<ThemedText type="muted" className="mt-4">
-					Loading quotes...
-				</ThemedText>
 			</View>
 		)
 	}
 
-	if (!isLoading && philosophyQuotes.length === 0) {
+	if (philosophyQuotes.length === 0) {
 		return (
-			<View className="flex-1 justify-center items-center">
-				<ThemedText type="muted" className="text-center px-4">
-					No quotes available at the moment.
+			<View
+				className="flex-1 items-center justify-center"
+				style={{ backgroundColor: background }}
+			>
+				<ThemedText type="title" className="text-center">
+					No philosophy quotes available
 				</ThemedText>
 			</View>
 		)
 	}
 
 	return (
-		<ThemedView className="flex-1">
-			<View className="flex-1 items-center justify-center px-5 relative">
-				<Swiper<Quote>
-					ref={swiperRef}
-					cards={philosophyQuotes}
-					renderCard={(quote, cardIndex) => {
-						if (!quote) return null
-						return (
-							<QuoteCard
-								quote={quote}
-								isActive={cardIndex === 0}
-								isSaved={isQuoteSaved(quote.id)}
-								variant="swiper"
-							/>
-						)
-					}}
-					onSwiped={(cardIndex) => {
-						setCurrentQuoteIndex(cardIndex + 1)
-					}}
-					cardIndex={0}
-					backgroundColor="transparent"
-					infinite
-					stackSize={3}
-					stackScale={0.95}
-					stackSeparation={22}
-					cardVerticalMargin={24}
-					cardHorizontalMargin={20}
-					animateOverlayLabelsOpacity
-					animateCardOpacity
-					horizontalSwipe={false}
-					verticalSwipe={true}
-					showSecondCard
-					disableBottomSwipe={false}
-					goBackToPreviousCardOnSwipeBottom
-				/>
-				<View className="absolute bottom-0 left-0 right-0 p-16 mb-28">
-					<ThemedText type="muted" className="text-center">
-						Swipe up for next, swipe down for previous.
-					</ThemedText>
-				</View>
-			</View>
-		</ThemedView>
+		<View className="flex-1" style={{ backgroundColor: background }}>
+			<VerticalList data={philosophyQuotes} />
+		</View>
 	)
 }

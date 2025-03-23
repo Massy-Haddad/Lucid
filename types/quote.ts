@@ -8,7 +8,7 @@ export interface Quote {
 	type: QuoteType
 	tags: string[]
 	backgroundImage?: any // ImageSourcePropType from react-native
-	savedAt?: string
+	_isSaving?: boolean
 }
 
 export interface FirestoreQuote extends Quote {
@@ -35,6 +35,7 @@ export type QuotesAction =
 	| { type: 'ADD_PHILOSOPHY_QUOTES'; payload: Quote[] }
 	| { type: 'SET_SAVED_QUOTES'; payload: FirestoreQuote[] }
 	| { type: 'ADD_SAVED_QUOTE'; payload: FirestoreQuote }
+	| { type: 'UPDATE_SAVED_QUOTE'; payload: FirestoreQuote }
 	| { type: 'REMOVE_SAVED_QUOTE'; payload: string }
 	| { type: 'SET_LOADING'; payload: boolean }
 	| { type: 'SET_LOADING_MORE'; payload: boolean }

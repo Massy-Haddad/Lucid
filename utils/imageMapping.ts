@@ -1,5 +1,6 @@
 import { ImageSourcePropType } from 'react-native'
 import { Images } from '@/constants/Images'
+import { QuoteType } from '@/types/quote'
 
 // Create a deterministic hash from a string
 function hashString(str: string): number {
@@ -14,23 +15,38 @@ function hashString(str: string): number {
 
 type ImageSet = Record<string, ImageSourcePropType>
 
-// Get a consistent image based on quote ID
+// Get a consistent image based on quote source and type
 export function getQuoteImage(
-	quoteId: string,
-	source: string
+	source: string,
+	type?: QuoteType
 ): ImageSourcePropType {
-	const imageSet =
-		source.toLowerCase() === 'anime'
-			? Images.quotes.animes
-			: Images.quotes.history
-	const imageKeys = Object.keys(imageSet as ImageSet)
-	const hash = hashString(quoteId)
+	let imageSet: ImageSet
+
+	// Use type if available, otherwise fall back to source
+	const category = type || source.toLowerCase()
+
+	switch (category) {
+		case 'anime':
+			imageSet = Images.quotes.animes
+			break
+		case 'movie':
+			imageSet = Images.quotes.movies
+			break
+		case 'philosophy':
+		case 'history':
+		default:
+			imageSet = Images.quotes.history
+	}
+
+	const imageKeys = Object.keys(imageSet)
+	const hash = hashString(source)
 	const index = hash % imageKeys.length
-	return (imageSet as ImageSet)[imageKeys[index]]
+	return imageSet[imageKeys[index]]
 }
 
 // Preload all images for better performance
 export const preloadedImages = {
 	animes: Object.values(Images.quotes.animes as ImageSet),
 	history: Object.values(Images.quotes.history as ImageSet),
+	movies: Object.values(Images.quotes.movies as ImageSet),
 }
