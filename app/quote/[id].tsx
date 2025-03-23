@@ -96,7 +96,7 @@ export default function QuoteDetailScreen() {
 				<View className="absolute left-5 z-10" style={{ top: insets.top + 5 }}>
 					<TouchableOpacity
 						onPress={() => router.back()}
-						className="w-10 h-10 rounded-full bg-black/30 items-center justify-center"
+						className="p-2 w-12 h-12 rounded-full bg-black/30 items-center justify-center"
 					>
 						<Feather name="chevron-left" size={28} color="#FFF" />
 					</TouchableOpacity>
@@ -104,7 +104,7 @@ export default function QuoteDetailScreen() {
 
 				<View className="absolute right-5 z-10" style={{ top: insets.top + 5 }}>
 					<TouchableOpacity
-						className="w-10 h-10 rounded-full bg-black/20 items-center justify-center"
+						className="p-1 w-12 h-12 rounded-full bg-black/20 items-center justify-center"
 						onPress={handleToggleSave}
 					>
 						<FontAwesome

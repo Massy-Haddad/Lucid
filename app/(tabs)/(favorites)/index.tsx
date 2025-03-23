@@ -1,5 +1,11 @@
 import React from 'react'
-import { FlatList, View, Dimensions, RefreshControl } from 'react-native'
+import {
+	FlatList,
+	View,
+	Dimensions,
+	RefreshControl,
+	TouchableOpacity,
+} from 'react-native'
 import { useQuotes } from '@/context/QuotesContext'
 import { ThemedText } from '@/components/ThemedText'
 import { ThemedView } from '@/components/ThemedView'
@@ -8,8 +14,9 @@ import { useColorScheme } from '@/hooks/useColorScheme'
 import { useThemeColor } from '@/hooks/useThemeColor'
 import { Feather } from '@expo/vector-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Quote } from '@/types/quote'
-
+import { Quote, QuoteType } from '@/types/quote'
+import { router } from 'expo-router'
+import { FilterPills, FilterOption } from '@/components/FilterPills'
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 const CARD_MARGIN = 8
 const CARD_PADDING = 16
@@ -18,9 +25,27 @@ const CARD_WIDTH = (SCREEN_WIDTH - (CARD_PADDING * 2 + CARD_MARGIN * 2)) / 2
 export default function FavoritesScreen() {
 	const { savedQuotes, loadSavedQuotes } = useQuotes()
 	const [refreshing, setRefreshing] = React.useState(false)
+	const [activeFilter, setActiveFilter] = React.useState<QuoteType | 'all'>(
+		'all'
+	)
 	const colorScheme = useColorScheme()
 	const mutedColor = useThemeColor({}, 'muted')
+	const tintColor = useThemeColor({}, 'tint')
+	const primaryForegroundColor = useThemeColor({}, 'primaryForeground')
+
 	const insets = useSafeAreaInsets()
+
+	const filterOptions: FilterOption[] = [
+		{ label: 'All', value: 'all' },
+		{ label: 'Anime', value: 'anime' },
+		{ label: 'Philosophy', value: 'philosophy' },
+		{ label: 'Movie', value: 'movie' },
+	]
+
+	const filteredQuotes = React.useMemo(() => {
+		if (activeFilter === 'all') return savedQuotes
+		return savedQuotes.filter((quote) => quote.type === activeFilter)
+	}, [savedQuotes, activeFilter])
 
 	const onRefresh = React.useCallback(async () => {
 		setRefreshing(true)
@@ -30,27 +55,45 @@ export default function FavoritesScreen() {
 
 	const renderHeader = () => (
 		<View
-			className="border-b border-neutral-800/10 dark:border-neutral-300/10 mb-4"
+			className="border-b border-neutral-800/10 dark:border-neutral-300/10 mb-0"
 			style={{ paddingTop: insets.top }}
 		>
 			<View className="px-4 py-4">
-				<View className="flex-row items-center gap-3">
-					<ThemedText type="title" className="text-3xl font-bold">
-						Favorites
-					</ThemedText>
-					<View
-						className="px-3 py-1 rounded-full opacity-80"
-						style={{ backgroundColor: mutedColor }}
-					>
-						<ThemedText type="default" className="text-sm">
-							{savedQuotes.length}
+				<View className="flex-row items-center justify-between gap-3">
+					<View className="flex-row items-center gap-3">
+						<ThemedText type="title" className="text-3xl font-bold">
+							Favorites
 						</ThemedText>
+						<View
+							className="px-3 py-1 rounded-full opacity-80"
+							style={{ backgroundColor: mutedColor }}
+						>
+							<ThemedText type="default" className="text-sm">
+								{filteredQuotes.length}
+							</ThemedText>
+						</View>
 					</View>
+					<TouchableOpacity
+						onPress={() => router.push('/(tabs)/(favorites)/create-quote')}
+						className="p-1 rounded-full bg-blue-500"
+					>
+						<Feather name="plus" size={24} color={primaryForegroundColor} />
+					</TouchableOpacity>
 				</View>
 				<ThemedText type="muted" className="text-base mt-1">
 					Your collection of inspiring quotes
 				</ThemedText>
 			</View>
+		</View>
+	)
+
+	const renderFilterHeader = () => (
+		<View className="py-2">
+			<FilterPills
+				options={filterOptions}
+				activeFilter={activeFilter}
+				onFilterChange={setActiveFilter}
+			/>
 		</View>
 	)
 
@@ -72,7 +115,7 @@ export default function FavoritesScreen() {
 			<QuoteCard
 				quote={item}
 				isActive={true}
-				style={{ height: SCREEN_WIDTH * 0.7 }}
+				style={{ height: SCREEN_WIDTH * 0.6 }}
 				variant="grid"
 			/>
 		</View>
@@ -80,17 +123,18 @@ export default function FavoritesScreen() {
 
 	return (
 		<ThemedView className="flex-1">
+			{renderHeader()}
 			<FlatList
-				data={savedQuotes}
+				data={filteredQuotes}
 				keyExtractor={(item) => item.id}
 				renderItem={renderItem}
 				numColumns={2}
 				contentContainerStyle={[
 					{ paddingHorizontal: CARD_PADDING - CARD_MARGIN },
-					savedQuotes.length === 0 && { flexGrow: 1 },
+					filteredQuotes.length === 0 && { flexGrow: 1 },
 				]}
 				columnWrapperStyle={{ justifyContent: 'flex-start' }}
-				ListHeaderComponent={renderHeader}
+				ListHeaderComponent={renderFilterHeader}
 				ListEmptyComponent={renderEmptyComponent}
 				showsVerticalScrollIndicator={false}
 				className="mb-36"
@@ -98,7 +142,7 @@ export default function FavoritesScreen() {
 					<RefreshControl
 						refreshing={refreshing}
 						onRefresh={onRefresh}
-						tintColor={colorScheme === 'dark' ? '#fff' : '#000'}
+						tintColor={tintColor}
 					/>
 				}
 			/>

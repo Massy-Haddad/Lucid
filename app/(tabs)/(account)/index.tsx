@@ -13,7 +13,7 @@ type MenuItem = {
 }
 
 export default function AccountScreen() {
-	const { session } = useSession()
+	const { session, signOut } = useSession()
 	const iconColor = useThemeColor({}, 'text')
 	const mutedColor = useThemeColor({}, 'mutedForeground')
 	const borderColor = useThemeColor({}, 'border')
@@ -49,9 +49,11 @@ export default function AccountScreen() {
 			onPress: () => {},
 		},
 		{
-			icon: 'trash-2',
-			title: 'Deactivate my account',
-			onPress: () => {},
+			icon: 'log-out',
+			title: 'Sign out',
+			onPress: () => {
+				signOut()
+			},
 			isDestructive: true,
 		},
 	]
@@ -137,7 +139,6 @@ export default function AccountScreen() {
 		</ThemedView>
 	)
 }
-
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,

@@ -14,6 +14,12 @@ export default function TabLayout() {
 					title: 'Favorites',
 				}}
 			/>
+			<Stack.Screen
+				name="create-quote"
+				options={{
+					title: 'Create Quote',
+				}}
+			/>
 		</Stack>
 	)
 }
