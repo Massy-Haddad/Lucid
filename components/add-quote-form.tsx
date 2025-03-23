@@ -20,6 +20,7 @@ import { Feather } from '@expo/vector-icons'
 import { FontAwesome6 } from '@expo/vector-icons'
 import { BlurView } from 'expo-blur'
 import { router } from 'expo-router'
+import Toast from 'react-native-toast-message'
 
 import TextRecognition from '@react-native-ml-kit/text-recognition'
 import { useQuotes } from '@/context/QuotesContext'
@@ -63,21 +64,87 @@ export default function AddQuoteForm() {
 		setQuoteData((prev) => ({ ...prev, text: result.text }))
 	}
 
+	const validateFields = () => {
+		if (!quoteData.text?.trim()) {
+			Toast.show({
+				type: 'error',
+				text1: 'Quote Text Required',
+				text2: 'Please enter the quote text',
+				position: 'bottom',
+				bottomOffset: 150,
+			})
+			return false
+		}
+
+		if (!quoteData.author?.trim()) {
+			Toast.show({
+				type: 'error',
+				text1: 'Author Required',
+				text2: 'Please enter the author name',
+				position: 'bottom',
+				bottomOffset: 150,
+			})
+			return false
+		}
+
+		if (!quoteData.source?.trim()) {
+			Toast.show({
+				type: 'error',
+				text1: 'Source Required',
+				text2: 'Please enter the source of the quote',
+				position: 'bottom',
+				bottomOffset: 150,
+			})
+			return false
+		}
+
+		if (!quoteData.type) {
+			Toast.show({
+				type: 'error',
+				text1: 'Quote Type Required',
+				text2: 'Please select a quote type',
+				position: 'bottom',
+				bottomOffset: 150,
+			})
+			return false
+		}
+
+		return true
+	}
+
 	const handleSaveQuote = async () => {
 		try {
+			if (!validateFields()) return
+
 			setIsSaving(true)
 			const newQuote: Quote = {
-				id: Date.now().toString(), // Simple ID generation
-				text: quoteData.text || '',
-				author: quoteData.author || '',
-				source: quoteData.source || '',
+				id: Date.now().toString(),
+				text: quoteData.text?.trim() || '',
+				author: quoteData.author?.trim() || '',
+				source: quoteData.source?.trim() || '',
 				type: quoteData.type || 'movie',
 				tags: quoteData.tags || [],
 			}
 			await saveQuote(newQuote)
+
+			Toast.show({
+				type: 'success',
+				text1: 'Quote Saved',
+				text2: 'Your quote has been saved successfully',
+				position: 'bottom',
+				bottomOffset: 150,
+			})
+
 			router.back()
 		} catch (error) {
 			console.error('Error saving quote:', error)
+			Toast.show({
+				type: 'error',
+				text1: 'Error',
+				text2: 'Failed to save quote. Please try again.',
+				position: 'bottom',
+				bottomOffset: 150,
+			})
 		} finally {
 			setIsSaving(false)
 		}
@@ -244,6 +311,12 @@ export default function AddQuoteForm() {
 											</ThemedText>
 										</TouchableOpacity>
 									</View>
+
+									{!quoteData.type && (
+										<ThemedText className="text-red-500 text-xs mt-1">
+											Please select a quote type
+										</ThemedText>
+									)}
 								</View>
 
 								<View className="space-y-4">
