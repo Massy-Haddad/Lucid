@@ -198,28 +198,23 @@ export function QuoteCard({
 								</ThemedText>
 
 								<View
-									className={`flex-row items-center gap-${isGrid ? '1' : '2'} ${
-										isGrid ? 'flex-wrap' : ''
-									}`}
+									className={`flex-row items-start w-full px-2 gap-${
+										isGrid ? '1' : '2'
+									} ${isGrid ? 'flex-wrap' : ''}`}
 								>
-									<MaterialCommunityIcons
-										name="comment-quote"
-										size={isGrid ? 14 : 16}
-										color={textColor}
-									/>
+									<View className="mt-2">
+										<MaterialCommunityIcons
+											name="comment-quote"
+											size={isGrid ? 14 : 16}
+											color={textColor}
+										/>
+									</View>
 									<ThemedText
 										type="mutedForeground"
 										numberOfLines={isGrid ? 1 : undefined}
 										style={isGrid ? { fontSize: 12 } : undefined}
 									>
-										{quote.author}
-									</ThemedText>
-									<ThemedText
-										type="mutedForeground"
-										numberOfLines={isGrid ? 1 : undefined}
-										style={isGrid ? { fontSize: 12 } : undefined}
-									>
-										• {quote.source}
+										{quote.author} • {quote.source ?? 'Unknown'}
 									</ThemedText>
 								</View>
 							</View>

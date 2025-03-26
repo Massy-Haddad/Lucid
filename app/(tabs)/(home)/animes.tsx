@@ -7,57 +7,71 @@ import { useColorScheme } from '@/hooks/useColorScheme'
 import { ThemedText } from '@/components/ThemedText'
 import { VerticalList } from '@/components/VerticalList'
 import { useThemeColor } from '@/hooks/useThemeColor'
+import { ThemedView } from '@/components/ThemedView'
+import { Feather } from '@expo/vector-icons'
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 export default function AnimeQuotesScreen() {
-	const {
-		animeQuotes,
-		currentQuoteIndex,
-		setCurrentQuoteIndex,
-		fetchAnimeQuotes,
-		saveQuote,
-		isQuoteSaved,
-		isLoading,
-	} = useQuotes()
+	const { animeQuotes, fetchAnimeQuotes, isLoading, isLoadingMore } =
+		useQuotes()
 	const colorScheme = useColorScheme()
 	const textColor = useThemeColor({}, 'text')
 	const background = useThemeColor({}, 'background')
+	const mutedColor = useThemeColor({}, 'muted')
 
 	useEffect(() => {
 		fetchAnimeQuotes()
 	}, [])
 
-	if (isLoading && animeQuotes.length === 0) {
+	const handleLoadMore = () => {
+		if (!isLoadingMore) {
+			fetchAnimeQuotes()
+		}
+	}
+
+	if (isLoading) {
 		return (
-			<View
-				className="flex-1 items-center justify-center"
-				style={{ backgroundColor: background }}
-			>
+			<ThemedView className="flex-1 items-center justify-center">
 				<ActivityIndicator
 					size="large"
 					color={Colors[colorScheme ?? 'light'].text}
 				/>
-			</View>
+			</ThemedView>
 		)
 	}
 
-	if (animeQuotes.length === 0) {
+	if (!isLoading && animeQuotes.length === 0) {
 		return (
-			<View
-				className="flex-1 items-center justify-center"
-				style={{ backgroundColor: background }}
-			>
-				<ThemedText type="title" className="text-center">
-					No anime quotes available
+			<ThemedView className="flex-1 items-center justify-center py-16">
+				<Feather
+					name="film"
+					size={36}
+					color={mutedColor}
+					className="opacity-90"
+				/>
+				<ThemedText type="subtitle" className="text-xl text-center mt-4">
+					No Anime Quotes Available
 				</ThemedText>
-			</View>
+				<ThemedText type="muted" className="text-center mt-2 px-8">
+					Check back later for inspiring anime quotes
+				</ThemedText>
+			</ThemedView>
 		)
 	}
 
 	return (
-		<View className="flex-1" style={{ backgroundColor: background }}>
-			<VerticalList data={animeQuotes} />
-		</View>
+		<ThemedView className="flex-1">
+			<View className="absolute top-4 left-0 right-0 bottom-0 items-center">
+				<ThemedText type="muted" className="text-center">
+					Swipe to see more quotes
+				</ThemedText>
+			</View>
+			<VerticalList
+				data={animeQuotes}
+				onEndReached={handleLoadMore}
+				isLoadingMore={isLoadingMore}
+			/>
+		</ThemedView>
 	)
 }
