@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router'
+import { router, Tabs } from 'expo-router'
 import { TouchableOpacity, View } from 'react-native'
 import { ThemedText } from '@/components/ThemedText'
 import { Feather, FontAwesome, Fontisto } from '@expo/vector-icons'
@@ -42,6 +42,9 @@ export default function TabLayout() {
 							marginRight: 16,
 							alignItems: 'center',
 							justifyContent: 'center',
+						}}
+						onPress={() => {
+							router.push('/(tabs)/(account)')
 						}}
 					>
 						<Feather name="sliders" size={20} color="#FFFFFF" />

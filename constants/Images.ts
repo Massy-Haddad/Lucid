@@ -1,4 +1,8 @@
 export const Images = {
+	logo: {
+		light: require('@/assets/images/icons/splash-icon-light.png'),
+		dark: require('@/assets/images/icons/splash-icon-dark.png'),
+	},
 	quotes: {
 		history: {
 			bg1: require('@/assets/images/cards/historical-bg-1.jpg'),
@@ -18,6 +22,14 @@ export const Images = {
 			bg5: require('@/assets/images/cards/animes-bg-5.jpg'),
 			bg6: require('@/assets/images/cards/animes-bg-6.jpg'),
 			bg7: require('@/assets/images/cards/animes-bg-7.jpg'),
+			bg8: require('@/assets/images/cards/animes-bg-8.jpg'),
+			bg9: require('@/assets/images/cards/animes-bg-9.jpg'),
+			bg10: require('@/assets/images/cards/animes-bg-10.jpg'),
+			bg11: require('@/assets/images/cards/animes-bg-11.jpg'),
+			bg12: require('@/assets/images/cards/animes-bg-12.jpg'),
+			bg13: require('@/assets/images/cards/animes-bg-13.jpg'),
+			bg14: require('@/assets/images/cards/animes-bg-14.jpg'),
+			bg15: require('@/assets/images/cards/animes-bg-15.jpg'),
 		},
 		movies: {
 			bg1: require('@/assets/images/cards/movies-bg-1.jpg'),
@@ -28,6 +40,14 @@ export const Images = {
 			bg6: require('@/assets/images/cards/movies-bg-6.jpg'),
 			bg7: require('@/assets/images/cards/movies-bg-7.jpg'),
 			bg8: require('@/assets/images/cards/movies-bg-8.jpg'),
+			bg9: require('@/assets/images/cards/movies-bg-9.jpg'),
+			bg10: require('@/assets/images/cards/movies-bg-10.jpg'),
+			bg11: require('@/assets/images/cards/movies-bg-11.jpg'),
+			bg12: require('@/assets/images/cards/movies-bg-12.jpg'),
+			bg13: require('@/assets/images/cards/movies-bg-13.jpg'),
+			bg14: require('@/assets/images/cards/movies-bg-14.jpg'),
+			bg15: require('@/assets/images/cards/movies-bg-15.jpg'),
+			bg16: require('@/assets/images/cards/movies-bg-16.jpg'),
 		},
 	},
 }

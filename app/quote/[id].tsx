@@ -17,7 +17,8 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { Images } from '@/constants/Images'
 import { captureRef } from 'react-native-view-shot'
 import * as Sharing from 'expo-sharing'
-import { QuoteCard } from '@/components/QuoteCard'
+import { SharedQuoteCard } from '@/components/SharedQuoteCard'
+import { useThemeColor } from '@/hooks/useThemeColor'
 
 const { height, width } = Dimensions.get('window')
 
@@ -33,6 +34,8 @@ export default function QuoteDetailScreen() {
 	const { isQuoteSaved, saveQuote, removeQuote, savedQuotes } = useQuotes()
 	const [isSaved, setIsSaved] = useState(false)
 	const quoteCardRef = React.useRef(null)
+
+	const accentColor = useThemeColor({}, 'accent')
 
 	// Update local state whenever savedQuotes changes
 	useEffect(() => {
@@ -164,19 +167,16 @@ export default function QuoteDetailScreen() {
 					style={{
 						position: 'absolute',
 						opacity: 0,
-						width: width * 0.8,
-						height: width * 0.8, // Add fixed height
-						left: -9999, // Use left instead of top
+						width: width * 0.8 * 1.1,
+						height: width * 0.8 * 1.1,
+						left: -9999,
+						backgroundColor: accentColor,
+						padding: 16,
 					}}
 					ref={quoteCardRef}
-					collapsable={false} // Add this to ensure the view is not optimized away
+					collapsable={false}
 				>
-					<QuoteCard
-						quote={quote}
-						isActive={true}
-						variant="swiper"
-						itemSize={width * 0.8}
-					/>
+					<SharedQuoteCard quote={quote} />
 				</View>
 			</ImageBackground>
 
