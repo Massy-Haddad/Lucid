@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
-import { View, ActivityIndicator, Dimensions } from 'react-native'
-import { QuoteCard } from '@/components/QuoteCard'
+import { ActivityIndicator } from 'react-native'
 import { useQuotes } from '@/context/QuotesContext'
 import { Colors } from '@/constants/Colors'
 import { useColorScheme } from '@/hooks/useColorScheme'
@@ -9,8 +8,6 @@ import { VerticalList } from '@/components/VerticalList'
 import { useThemeColor } from '@/hooks/useThemeColor'
 import { ThemedView } from '@/components/ThemedView'
 import { Feather } from '@expo/vector-icons'
-
-const { height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 export default function AnimeQuotesScreen() {
 	const { animeQuotes, fetchAnimeQuotes, isLoading, isLoadingMore } =
@@ -26,7 +23,10 @@ export default function AnimeQuotesScreen() {
 
 	const handleLoadMore = () => {
 		if (!isLoadingMore) {
-			fetchAnimeQuotes()
+			console.log('[AnimeQuotesScreen] Fetching more anime quotes')
+			fetchAnimeQuotes(true) // Force fetch to ensure more quotes are loaded
+		} else {
+			console.log('[AnimeQuotesScreen] Already loading more quotes, skipping')
 		}
 	}
 
@@ -62,11 +62,6 @@ export default function AnimeQuotesScreen() {
 
 	return (
 		<ThemedView className="flex-1">
-			<View className="absolute top-4 left-0 right-0 bottom-0 items-center">
-				<ThemedText type="muted" className="text-center">
-					Swipe to see more quotes
-				</ThemedText>
-			</View>
 			<VerticalList
 				data={animeQuotes}
 				onEndReached={handleLoadMore}

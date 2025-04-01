@@ -11,8 +11,8 @@ import { ImagePreloader } from '@/components/ImagePreloader'
 const Welcome = () => {
 	const { session, isLoading } = useSession()
 
-	if (!isLoading && session) return <Redirect href="/(tabs)/(home)/animes" />
-	else if (!isLoading && !session) return <Redirect href="/auth?mode=signin" />
+	if (!isLoading && session) return <Redirect href="/(tabs)/(home)/movies" />
+	//else if (!isLoading && !session) return <Redirect href="/auth?mode=signin" />
 
 	return (
 		<>
@@ -26,11 +26,18 @@ const Welcome = () => {
 						resizeMode="contain"
 					/>
 
+					<ThemedText type="subtitle" className="text-center mt-5">
+						Welcome to Lucid
+					</ThemedText>
+					<ThemedText type="muted" className="text-center mt-2">
+						Your favorites quotes in one place!
+					</ThemedText>
+
 					<View
-						className="w-1/2 mt-7 p-4 rounded-lg bg-purple-100/20"
+						className="w-1/2 mt-10 p-4 rounded-lg bg-purple-100/20"
 						onTouchEnd={() => router.push('/auth?mode=signin')}
 					>
-						<ThemedText className="text-center">Continue with Email</ThemedText>
+						<ThemedText className="text-center">Get Started</ThemedText>
 					</View>
 				</View>
 				<StatusBar backgroundColor="#161622" style="light" />

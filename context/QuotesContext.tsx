@@ -181,7 +181,7 @@ export function QuotesProvider({ children }: { children: React.ReactNode }) {
 	const fetchAnimeQuotes = async (force: boolean = false) => {
 		try {
 			// Only fetch if we're running low on quotes or forced
-			if (!force && state.animeQuotes.length > state.currentQuoteIndex + 2) {
+			if (!force && state.animeQuotes.length > state.currentQuoteIndex + 5) {
 				return
 			}
 
@@ -192,7 +192,10 @@ export function QuotesProvider({ children }: { children: React.ReactNode }) {
 				payload: true,
 			})
 
-			const quotes = await animeService.getRandomQuotes()
+			// Fetch new quotes
+			const quotes = await animeService.getRandomQuotes({
+				random: 10, // Fetch 10 quotes at a time
+			})
 
 			dispatch({
 				type:

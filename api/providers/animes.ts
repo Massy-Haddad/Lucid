@@ -44,7 +44,7 @@ class AnimeQuotesProvider {
 				queryParams.append('show', options.show)
 			}
 
-			// Always get random quotes, default to 10 if not specified
+			// Add pagination support by appending a random count
 			queryParams.append('random', (options.random || 10).toString())
 
 			const url = `${this.baseUrl}?${queryParams.toString()}`
