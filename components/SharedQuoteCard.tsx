@@ -36,7 +36,7 @@ export function SharedQuoteCard({ quote }: SharedQuoteCardProps) {
 			<ImageBackground
 				source={quote.backgroundImage}
 				style={StyleSheet.absoluteFillObject}
-				blurRadius={10}
+				blurRadius={5}
 				imageStyle={{
 					borderRadius: 24,
 					resizeMode: 'cover',
@@ -45,9 +45,9 @@ export function SharedQuoteCard({ quote }: SharedQuoteCardProps) {
 				<LinearGradient
 					colors={[
 						'transparent',
-						`hsla(${colorScheme === 'dark' ? '255 0% 0%' : '0 0% 0%'} / 0.85)`,
+						`hsla(${colorScheme === 'dark' ? '255 0% 0%' : '0 0% 0%'} / 0.9)`,
 					]}
-					locations={[0.2, 1]}
+					locations={[0.2, 0.8]}
 					style={{
 						position: 'absolute',
 						left: 0,
