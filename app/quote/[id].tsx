@@ -15,6 +15,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ThemedView } from '@/components/ThemedView'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Images } from '@/constants/Images'
+import { captureRef } from 'react-native-view-shot'
+import * as Sharing from 'expo-sharing'
+import { QuoteCard } from '@/components/QuoteCard'
 
 const { height, width } = Dimensions.get('window')
 
@@ -29,6 +32,7 @@ export default function QuoteDetailScreen() {
 	const quote = JSON.parse(quoteParam as string) as QuoteWithBackground
 	const { isQuoteSaved, saveQuote, removeQuote, savedQuotes } = useQuotes()
 	const [isSaved, setIsSaved] = useState(false)
+	const quoteCardRef = React.useRef(null)
 
 	// Update local state whenever savedQuotes changes
 	useEffect(() => {
@@ -60,6 +64,36 @@ export default function QuoteDetailScreen() {
 			setIsSaved(newSavedState)
 		} catch (error) {
 			console.error('[QuoteDetail] Error toggling quote save:', error)
+		}
+	}
+
+	const handleShare = async () => {
+		try {
+			// Check if sharing is available
+			const isSharingAvailable = await Sharing.isAvailableAsync()
+			if (!isSharingAvailable) {
+				alert('Sharing is not available on your platform')
+				return
+			}
+
+			// Add a small delay to ensure the view is rendered
+			await new Promise((resolve) => setTimeout(resolve, 100))
+
+			// Capture the quote card as an image
+			const uri = await captureRef(quoteCardRef, {
+				format: 'png',
+				quality: 1,
+				result: 'tmpfile',
+			})
+
+			// Share the image
+			await Sharing.shareAsync(uri, {
+				mimeType: 'image/png',
+				dialogTitle: 'Share Quote',
+			})
+		} catch (error) {
+			console.error('[QuoteDetail] Error sharing quote:', error)
+			alert('Failed to share quote')
 		}
 	}
 
@@ -102,7 +136,17 @@ export default function QuoteDetailScreen() {
 					</TouchableOpacity>
 				</View>
 
-				<View className="absolute right-5 z-10" style={{ top: insets.top + 5 }}>
+				<View
+					className="absolute right-5 z-10 flex-row gap-2"
+					style={{ top: insets.top + 5 }}
+				>
+					<TouchableOpacity
+						className="p-1 w-12 h-12 rounded-full bg-black/20 items-center justify-center"
+						onPress={handleShare}
+					>
+						<Feather name="share" size={24} color="#FFF" />
+					</TouchableOpacity>
+
 					<TouchableOpacity
 						className="p-1 w-12 h-12 rounded-full bg-black/20 items-center justify-center"
 						onPress={handleToggleSave}
@@ -113,6 +157,26 @@ export default function QuoteDetailScreen() {
 							color={isSaved ? '#FF3B30' : '#FFF'}
 						/>
 					</TouchableOpacity>
+				</View>
+
+				{/* Hidden QuoteCard for sharing */}
+				<View
+					style={{
+						position: 'absolute',
+						opacity: 0,
+						width: width * 0.8,
+						height: width * 0.8, // Add fixed height
+						left: -9999, // Use left instead of top
+					}}
+					ref={quoteCardRef}
+					collapsable={false} // Add this to ensure the view is not optimized away
+				>
+					<QuoteCard
+						quote={quote}
+						isActive={true}
+						variant="swiper"
+						itemSize={width * 0.8}
+					/>
 				</View>
 			</ImageBackground>
 
