@@ -1,24 +1,19 @@
 import { Redirect, Stack } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
 
-import Splash from '@/components/Splash'
-import { useSession } from '../../context/AuthProvider'
+import { useSession } from '@/context/AuthProvider'
 
-export default function AppLayout() {
+export default function AuthLayout() {
 	const { session, isLoading } = useSession()
 
-	if (isLoading) {
-		return <Splash />
-	}
-
-	// Only require authentication within the (app) group's layout as users
-	// need to be able to access the (auth) group and sign in again.
-	if (!session) {
-		return <Redirect href="/auth?mode=signin" />
+	// If user is authenticated, redirect to home
+	if (!isLoading && session) {
+		return <Redirect href="/(tabs)/(home)/movies" />
 	}
 
 	return (
-		<Stack>
-			<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+		<Stack screenOptions={{ headerShown: false }}>
+			<Stack.Screen name="auth" />
 		</Stack>
 	)
 }
